@@ -1,7 +1,11 @@
-const core = require("./framework/core.ts");
+import { App } from "./framework/core";
 
-core.setWorkspace("../../MetaBot-DB/")
 
-core.prepare()
 
-core.start()
+var bot = new App()
+
+bot.setWorkspace("../MetaBot-DB")
+console.log("Preparing...");
+bot.prepare()
+console.log("Starting Bot.");
+bot.start()
