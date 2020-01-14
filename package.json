@@ -1,0 +1,28 @@
+{
+  "name": "metabot-v7",
+  "version": "1.0.0",
+  "description": "Muffins Bot High-Level Discord Bot Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MetaMuffin/MetaBot.git"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "framework",
+    "typescript"
+  ],
+  "author": "MetaMuffin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MetaMuffin/MetaBot/issues"
+  },
+  "homepage": "https://github.com/MetaMuffin/MetaBot#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  }
+}
