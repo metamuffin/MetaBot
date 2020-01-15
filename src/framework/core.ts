@@ -9,7 +9,7 @@ export class App {
     public static client: Client;
     public static prefix: string;
     public static workspace: string;
-    public static modules: IModule;
+    public static modules: Array<IModule>;
 
     setWorkspace(path:string):void {
         App.workspace = path;
@@ -30,5 +30,20 @@ export class App {
         Database.get().bot.token = "THIS WAS DELETED.... HAHAHAHAA"
         
     }
-    
+
+    @On("message")
+    public static messageHandler(message: Message):void {
+        let isCommand:boolean = message.content.startsWith(App.prefix)
+        if (isCommand){
+            let c_parsed = Helper.parse()
+        }
+
+        for (const m of App.modules) {
+            if (isCommand){
+                for (const h of m.commands){
+                    
+                }
+            }
+        }
+    }
 }

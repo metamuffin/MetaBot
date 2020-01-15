@@ -8,7 +8,7 @@ export interface ICommand {
     subcommmands:Array<ICommand>
 
     handle: (args: Array<[EType,any]>, event: any) => void,
-
+    
 
 
 }
