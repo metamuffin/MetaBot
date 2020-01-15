@@ -1,9 +1,9 @@
 
 
-export enum Type {
-    TString,
-    TInteger,
-    TFloat,
-    TCommand,
-    TMember,
+export enum EType {
+    EString,
+    EInteger,
+    EFloat,
+    ECommand,
+    EMember,
 }

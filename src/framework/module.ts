@@ -1,8 +1,8 @@
-import { Command } from "./command";
+import { ICommand } from "./command";
 
 
 
-export interface Module {
+export interface IModule {
     name:string,
-    command:Array<Command>,
+    command:Array<ICommand>,
 }

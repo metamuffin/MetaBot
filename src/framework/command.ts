@@ -1,10 +1,13 @@
-import { Type } from "./helper"
+import { EType } from "./helper";
 
 
-export interface Command {
+export interface ICommand {
     name:string,
-    
-    handle: (args: Array<[Type,any]>, event: any) => void,
+    argtypes:Array<EType>,
+    useSubcommands:boolean;
+    subcommmands:Array<ICommand>
+
+    handle: (args: Array<[EType,any]>, event: any) => void,
 
 
 
