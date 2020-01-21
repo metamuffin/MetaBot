@@ -1,5 +1,9 @@
+import { App } from "../framework/core";
+import { ModuleTest } from "./testmodule";
 
 
-module.exports.registerModules = ():void => {
-    
+export function registerModules():void {
+    App.modules.push(
+        ModuleTest
+    )
 }
