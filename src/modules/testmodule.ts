@@ -32,12 +32,24 @@ var CommandTestGetPerm:ICommand = {
     
 }
 
+var CommandTestInterface:ICommand = {
+    name: "testui",
+    useSubcommands: false,
+    subcommmands: [],
+    argtypes: [],
+    requiredPermission: null,
+    handle: (c) => {
+        
+    
+    }
+}
 
 
 export var ModuleTest:IModule = {
     name: "test",
     commands: [
         CommandTestPing,
-        CommandTestGetPerm
+        CommandTestGetPerm,
+        CommandTestInterface
     ]
 }

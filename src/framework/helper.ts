@@ -36,7 +36,7 @@ export class Helper {
             }
         }
         if ((!permok) && doError){
-            context.err("Berechtigungen nicht ausreichend.",`Du brauchst ${context.translation.core.no_permission}, um diesen Befehl auszuführen.`)
+            context.err(context.translation.core.permission.no_permission.title,context.translation.core.permission.no_permission.description.replace("{perm}",permstring))
         }
         return permok;
     }
