@@ -1,7 +1,5 @@
 import { IModule } from "../framework/module";
 import { ICommand } from "../framework/command";
-import { App } from "../framework/core";
-import { Database } from "../framework/database";
 import { Helper } from "../framework/helper";
 
 

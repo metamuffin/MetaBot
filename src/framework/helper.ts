@@ -1,15 +1,15 @@
 import { Message, User, AudioPlayer } from "discord.js";
 import { Database } from "./database";
-import { CContext } from "./command";
+import { CContext, IArgument } from "./command";
 import { userInfo } from "os";
 
 
 export enum EType {
-    EString,
-    EInteger,
-    EFloat,
-    ECommand,
-    EMember,
+    String,
+    Integer,
+    Float,
+    Command,
+    Member,
 }
 
 export class Helper {
@@ -41,15 +41,64 @@ export class Helper {
         return permok;
     }
 
+    public static parseArguments(msg:string,types:Array<IArgument>,context:CContext):Array<any> {
+        types = types.slice(0)
+        var c_arg = types.pop() || {type:EType.String,optional:true,name:"unnamed"}
+        var in_quotes = false;
+        var current_buffer:string = ""
+        var args:Array<any> = [];
+
+        for (let i = 0; i < msg.length; i++) {
+            const c = msg.charAt(i);
+        
+            if (c == " " && !in_quotes){
+                args.push(this.parseArgument(current_buffer,c_arg.type,context))
+                current_buffer = "";
+            }
+
+            current_buffer += c
+        }
+
+
+        return []
+    }
+
+    public static parseArgument(buffer:string,type:EType,context:CContext):any|null {
+        var r:any|null = ""
+        if (type == EType.String) r = buffer
+        if (type == EType.Float) {
+            try {
+                r = parseFloat(buffer.trim());
+            } catch (e) {
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.float_invalid);
+            }
+        }
+        if (type == EType.Integer) {
+            try {
+                r = parseInt(buffer.trim());
+            } catch (e) {
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.int_invalid);
+            }
+        }
+        return r
+    }
+
     public static getUserTranslation(u:User):any{
         return Database.get().lang[this.getUserAccount(u).language]
     }
 
-    public static getUserAccount(u:User):any{
-        if (!Database.get().members.hasOwnProperty(u.id.toString())){
-            Database.get().members[u.id.toString()] = {...(Database.get().members.default)};
+    public static getGenericAccount(obj:any,indetifier:any):any {
+        if(!obj.hasOwnProperty(indetifier.toString())) {
+            obj[indetifier.toString()] = {...obj.default};
         }
-        
-        return Database.get().members[u.id.toString()]
+        return obj[indetifier.toString()]
+    }
+
+    public static getUserAccount(u:User):any{
+        return Helper.getGenericAccount(Database.get().members,u.id);
+    }
+
+    public static getServerData(id:any):any {
+        return Helper.getGenericAccount(Database.get().servers,id);
     }
 }

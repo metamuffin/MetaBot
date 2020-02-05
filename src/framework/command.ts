@@ -3,10 +3,16 @@ import { Message, Channel, GuildMember, User, TextChannel, Client } from "discor
 import { IModule } from "./module";
 import { App } from "./core";
 
+export interface IArgument {
+    type:EType,
+    name:string,
+    optional:boolean
+}
 
 export interface ICommand {
     name:string,
-    argtypes:Array<EType>,
+    alias:Array<string>,
+    argtypes:Array<IArgument>,
     useSubcommands:boolean,
     subcommmands:Array<ICommand>,
     requiredPermission:string|null,

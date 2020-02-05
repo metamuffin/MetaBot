@@ -4,6 +4,7 @@ import { Database } from "./database";
 import { IModule } from "./module";
 import { Helper } from "./helper";
 import { ICommand, CContext } from "./command";
+import { loadNativeCommands } from "./commands/loader";
 
 
 @Discord
@@ -21,6 +22,8 @@ export class App {
         App.client = new Client();
 
         Database.load()
+
+        loadNativeCommands()
     }
     
     start():void {
@@ -42,7 +45,9 @@ export class App {
         console.log(c_names);
         
         let foundCommand:boolean = false;
+        var activeModules:Array<string> = Helper.getServerData(message.guild.id);
         for (const m of App.modules) {
+            if (!activeModules.includes(m.name)) continue;
             if (isCommand){
                 for (const h of m.commands){
                     var res = App.getMatchingCommand(h,c_names)
