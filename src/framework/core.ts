@@ -32,6 +32,7 @@ export class App {
             `${__dirname}/*Discord.ts`
         );
         Database.get().bot.token = "THIS WAS DELETED.... HAHAHAHAA"
+        console.log(Database.get());
         
     }
 
@@ -45,7 +46,7 @@ export class App {
         console.log(c_names);
         
         let foundCommand:boolean = false;
-        var activeModules:Array<string> = Helper.getServerData(message.guild.id);
+        var activeModules:Array<string> = Helper.getServerData(message.guild.id).modules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
             if (isCommand){
@@ -54,9 +55,12 @@ export class App {
                     if (res != null){
                         console.log("Found a matching command.");
                         foundCommand = true;
-                        let context:CContext = new CContext(message,m,[])
+                        let context:CContext = new CContext(message,m,[],res)
                         if (Helper.ensurePermission(context,h.requiredPermission)){
-                            h.handle(context)
+                            console.log("Handling this Command.");
+                            res.handle(context)
+                        } else {
+                            console.log("Permission denied.");
                         }
                     }
                 }
@@ -68,14 +72,15 @@ export class App {
     }
 
     public static getMatchingCommand(command:ICommand, names:Array<String>): ICommand | null {
-        if (!(command.name == names[0])) return null;
+        if (!((command.name == names[0].toLowerCase()) || (command.alias.includes(names[0].toLowerCase())))) return null;
         if (!command.useSubcommands){
             return command
         } else {
             var names_shifted:Array<String> = names.slice(0)
             names_shifted.shift()
+            
             for (const c of command.subcommmands) {
-                var res = this.getMatchingCommand(c,names)
+                var res = this.getMatchingCommand(c,names_shifted)
                 if (res != null) {
                     return res;
                 }
@@ -83,5 +88,4 @@ export class App {
             return null;
         }
     }
-
 }

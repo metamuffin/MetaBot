@@ -6,6 +6,7 @@ import { Helper } from "../framework/helper";
 
 var CommandTestPing:ICommand = {
     name: "ping",
+    alias: [],
     useSubcommands: false,
     subcommmands: [],
     argtypes: [],
@@ -19,19 +20,21 @@ var CommandTestPing:ICommand = {
 
 var CommandTestGetPerm:ICommand = {
     name: "getperm",
+    alias: [],
     useSubcommands: false,
     subcommmands: [],
     argtypes: [],
     requiredPermission: null,
     handle: (c) => {
         c.log("BLUB","BLUB")
-        Helper.getUserAccount(c.author).permissions.push("test.*")
+        Helper.getUserAccount(c.guild,c.author).permissions.push("test.*")
     }
     
 }
 
 var CommandTestInterface:ICommand = {
     name: "testui",
+    alias: [],
     useSubcommands: false,
     subcommmands: [],
     argtypes: [],

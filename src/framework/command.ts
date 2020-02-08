@@ -1,5 +1,5 @@
 import { EType, Helper } from "./helper";
-import { Message, Channel, GuildMember, User, TextChannel, Client } from "discord.js";
+import { Message, Channel, GuildMember, User, TextChannel, Client, Guild } from "discord.js";
 import { IModule } from "./module";
 import { App } from "./core";
 
@@ -24,21 +24,24 @@ export interface ICommand {
 }
 
 export class CContext {
-    public args:Array<[EType,any]> = [];
+    public args:Array<[EType,any]>;
     public channel:TextChannel
     public author:User
     public message:Message
     public translation:any
+    public guild:Guild
 
-    constructor (event:Message,module:IModule, callstack:Array<ICommand>) {
+    constructor (event:Message,module:IModule, callstack:Array<ICommand>, command:ICommand) {
         this.message = event
         this.author = event.author
+        this.guild = event.guild
         if (!(event.channel instanceof TextChannel)){
             throw new Error("Cannot use Commands in DM Channels")
             return
         }
         this.channel = (event.channel instanceof TextChannel) ? event.channel : (():any=>{return null})()
         this.translation = Helper.getUserTranslation(this.message.author)
+        this.args = Helper.parseArguments(event.content,command.argtypes,this);
     }
 
     public log = (title:string,description:string):void => {

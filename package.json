@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon",
+    "start:ts": "ts-node ./src/index.ts",
     "start": "node ./build/index.js",
     "build": "npx tsc"
   },
@@ -29,7 +30,8 @@
     "@typeit/discord": "^1.0.3",
     "discord.js": "^11.5.1",
     "reflect-metadata": "^0.1.13",
-    "tslib": "^1.10.0"
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.5"
   },
   "devDependencies": {
     "@types/node": "^13.1.6",

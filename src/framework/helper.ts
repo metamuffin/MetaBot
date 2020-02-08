@@ -21,7 +21,7 @@ export class Helper {
 
     public static ensurePermission(context:CContext, permstring: string|null, doError:boolean=true):boolean{
         if (permstring == null) return true;
-        let userperms:Array<string> = this.getUserAccount(context.author).permissions
+        let userperms:Array<string> = this.getUserAccount(context.guild,context.author).permissions
         userperms.map((e)=>{e.toLowerCase()})
         permstring = permstring.toLowerCase()
 
@@ -84,21 +84,31 @@ export class Helper {
     }
 
     public static getUserTranslation(u:User):any{
-        return Database.get().lang[this.getUserAccount(u).language]
+        return Database.get().lang[this.getGlobalUserAccount(u).language]
     }
 
-    public static getGenericAccount(obj:any,indetifier:any):any {
+    public static getGenericAccount(obj:any,indetifier:any):[any,boolean] {
+        var new_created:boolean = false;
         if(!obj.hasOwnProperty(indetifier.toString())) {
             obj[indetifier.toString()] = {...obj.default};
+            new_created = true
         }
-        return obj[indetifier.toString()]
+        return [obj[indetifier.toString()], new_created];
     }
 
-    public static getUserAccount(u:User):any{
-        return Helper.getGenericAccount(Database.get().members,u.id);
+    public static getGlobalUserAccount(u:User):any{
+        var r = Helper.getGenericAccount(Database.get().members,u.id);
+        if (r[1]){
+            r[0].id = u.id
+            r[0].name = u.username
+        }
+        return r[0]
+    }
+    public static getUserAccount(guild_id:any, u:User){
+        return Helper.getGenericAccount(Helper.getGenericAccount(Database.get().servers,guild_id)[0],u.id)[0];
     }
 
     public static getServerData(id:any):any {
-        return Helper.getGenericAccount(Database.get().servers,id);
+        return Helper.getGenericAccount(Database.get().servers,id)[0];
     }
 }
