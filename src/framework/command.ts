@@ -24,7 +24,7 @@ export interface ICommand {
 }
 
 export class CContext {
-    public args:Array<[EType,any]>;
+    public args:Array<any>;
     public channel:TextChannel
     public author:User
     public message:Message
@@ -47,6 +47,7 @@ export class CContext {
     public log = (title:string,description:string):void => {
         this.send(title,description,"log")
     }
+    
     public err = (title:string,description:string):void => {
         this.send(title,description,"error")
     }

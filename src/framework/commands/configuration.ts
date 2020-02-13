@@ -48,17 +48,21 @@ var CommandConfigModuleEnable:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
+        console.log(c);
+        console.log(c.args);
+        
+        
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
-        if (modlist.includes(c.args[0][1].toLowerCase())) {
+        if (modlist.includes(c.args[0].toLowerCase())) {
             var cfg = Helper.getServerData(c.guild.id).modules
-            if (!cfg.includes(c.args[0][1].toLowerCase())) {
-                cfg.push(c.args[0][1].toLowerCase())
+            if (!cfg.includes(c.args[0].toLowerCase())) {
+                cfg.push(c.args[0].toLowerCase())
                 c.log(c.translation.core.success_generic,c.translation.core.config.module.success_enabled)
             } else {
-                c.err(c.translation.core.error_generic,c.translation.core.config.module.error_already_enabled.replace("{0}",c.args[0][1]))
+                c.err(c.translation.core.error_generic,c.translation.core.config.module.error_already_enabled.replace("{0}",c.args[0]))
             }
         } else {
-            c.err(c.translation.core.error_generic,c.translation.core.config.module.error_module_not_found.replace("{0}",c.args[0][1]))
+            c.err(c.translation.core.error_generic,c.translation.core.config.module.error_module_not_found.replace("{0}",c.args[0]))
         }
     }
 }
