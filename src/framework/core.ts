@@ -1,4 +1,4 @@
-import { Discord, On, Client } from "@typeit/discord";
+import { Discord, On, Client, IAppConfig } from "@typeit/discord";
 import { Message } from "discord.js"
 import { Database } from "./database";
 import { IModule } from "./module";
@@ -32,14 +32,13 @@ export class App {
             `${__dirname}/*Discord.ts`
         );
         Database.get().bot.token = "THIS WAS DELETED.... HAHAHAHAA"
-        console.log(Database.get());
         
     }
 
     @On("message")
     public static messageHandler(message: Message):void {
         let isCommand:boolean = message.content.startsWith(App.prefix)
-        let c_names:Array<String> = [];
+        let c_names:Array<string> = [];
         if (isCommand){
             c_names = Helper.getCommandNames(message.content)
         }
@@ -52,13 +51,16 @@ export class App {
             if (isCommand){
                 for (const h of m.commands){
                     var res = App.getMatchingCommand(h,c_names)
-                    if (res != null){
+                    if (res.command != null){
                         console.log("Found a matching command.");
                         foundCommand = true;
-                        let context:CContext = new CContext(message,m,[],res)
+                        console.log(res.names);
+                        
+                        
+                        let context:CContext = new CContext(message,m,[],res.command,res.names)
                         if (Helper.ensurePermission(context,h.requiredPermission)){
                             console.log("Handling this Command.");
-                            res.handle(context)
+                            res.command.handle(context)
                         } else {
                             console.log("Permission denied.");
                         }
@@ -71,21 +73,23 @@ export class App {
         }
     }
 
-    public static getMatchingCommand(command:ICommand, names:Array<String>): ICommand | null {
-        if (!((command.name == names[0].toLowerCase()) || (command.alias.includes(names[0].toLowerCase())))) return null;
+    public static getMatchingCommand(command:ICommand, names:Array<string>):{command:ICommand|null,names:Array<string>} {
+        if (!((command.name == names[0].toLowerCase()) || (command.alias.includes(names[0].toLowerCase())))) return {command:null,names:[]};
+        
+        var names_shifted:Array<string> = names.slice(0)
+        names_shifted.shift()
+
         if (!command.useSubcommands){
-            return command
+            return {command:command,names:names_shifted}
         } else {
-            var names_shifted:Array<String> = names.slice(0)
-            names_shifted.shift()
             
             for (const c of command.subcommmands) {
                 var res = this.getMatchingCommand(c,names_shifted)
-                if (res != null) {
-                    return res;
+                if (res.command != null) {
+                    return res
                 }
             }
-            return null;
+            return {command:null,names:[]};
         }
     }
 }

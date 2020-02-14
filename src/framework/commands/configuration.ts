@@ -48,7 +48,6 @@ var CommandConfigModuleEnable:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        console.log(c);
         console.log(c.args);
         
         

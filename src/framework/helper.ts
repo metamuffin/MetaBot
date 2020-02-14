@@ -15,7 +15,7 @@ export enum EType {
 export class Helper {
     // Returns the name of command read from a Message that was interpreted as an command.
     // For the usage of Sub-commands, also the next words are returned in the array.
-    public static getCommandNames(msg:string):Array<String> {
+    public static getCommandNames(msg:string):Array<string> {
         return msg.substr(1,msg.length).split(" ")
     }
 
@@ -30,7 +30,6 @@ export class Helper {
 
         for (let i = 0; i < permparts.length; i++) {
             let permtest:string = (i == permparts.length-1) ? permstring : (permparts.slice(0,i+1).join(".") + ".*")
-            console.log(permtest);
             if (userperms.includes(permtest)) {
                 permok = true;
             }
@@ -48,19 +47,39 @@ export class Helper {
         var current_buffer:string = ""
         var args:Array<any> = [];
 
+        if (msg.search(" ") % 2 == 1) {
+            context.err(context.translation.core.general.parse_error.title,"")
+            return []
+        }
+        msg += " "
+
         for (let i = 0; i < msg.length; i++) {
             const c = msg.charAt(i);
+            
         
-            if (c == " " && !in_quotes){
+            if (c == " " && (!in_quotes)){
+                console.log(`Buffer: ${current_buffer}`);
+                
                 args.push(this.parseArgument(current_buffer,c_arg.type,context))
+                var temp:IArgument|undefined = types.pop()
+                if (temp == undefined){
+                    if (i == msg.length - 1) break
+                    context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.not_enough_args)
+                    return args
+                }
+                c_arg = temp;
                 current_buffer = "";
+
+            }
+            if (c=="\""){
+                in_quotes =! in_quotes
             }
 
             current_buffer += c
         }
 
 
-        return []
+        return args
     }
 
     public static parseArgument(buffer:string,type:EType,context:CContext):any|null {
@@ -71,6 +90,7 @@ export class Helper {
                 r = parseFloat(buffer.trim());
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.float_invalid);
+                r = undefined
             }
         }
         if (type == EType.Integer) {
@@ -78,6 +98,7 @@ export class Helper {
                 r = parseInt(buffer.trim());
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.int_invalid);
+                r = undefined
             }
         }
         return r

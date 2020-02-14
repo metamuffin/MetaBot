@@ -1,6 +1,7 @@
+console.log("Started. -> Importing");
 import { App } from "./framework/core";
 import { registerModules } from "./modules/moduleLoader";
-import { Database } from "./framework/database";
+console.log("Imported. -> Logging in");
 
 
 
