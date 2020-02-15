@@ -33,4 +33,15 @@ export class Database {
     static get():any {
         return Database.db;
     }
+
+    static save():void {
+        let path:string = App.workspace + "index.json"
+        let j:any = fs.readFileSync(path).toString()
+        let index = JSON.parse(j);
+        let dbnames = index.names;
+        for (const dbname of dbnames) {
+            let path:string = App.workspace + dbname + ".json"
+            let container:any = Database.db
+        }
+    }
 }

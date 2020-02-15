@@ -21,3 +21,7 @@ Run `npm run start:dev` to use nodemon for debugging
 ## Usage
 
 Documentation is still WIP.
+
+## Licence
+
+This Project is provided under an GNU GPL v3 Licence.
