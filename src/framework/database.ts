@@ -40,8 +40,24 @@ export class Database {
         let index = JSON.parse(j);
         let dbnames = index.names;
         for (const dbname of dbnames) {
+            
             let path:string = App.workspace + dbname + ".json"
+            console.log(`Saving ${path} ...`);
             let container:any = Database.db
+            for (var ps of dbname.split("/")){
+                container = container[ps];
+                if (container == undefined) console.log("Something went wrong while saving.");               
+            }
+            let j:string = JSON.stringify(container)
+            fs.writeFileSync(path,j);
         }
+    }
+
+    private static autosaveHandle:any = null;
+    static startAutosave():void {
+        this.autosaveHandle = setInterval(this.save,60000)
+    }
+    static stopAutosave():void {
+        clearInterval(this.autosaveHandle)
     }
 }

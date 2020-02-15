@@ -22,6 +22,7 @@ export class App {
         App.client = new Client();
 
         Database.load()
+        Database.startAutosave()
 
         loadNativeCommands()
     }
