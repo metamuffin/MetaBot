@@ -11,8 +11,9 @@ export class Database {
         let path:string = App.workspace + "index.json"
         let j:any = fs.readFileSync(path).toString()
         let index = JSON.parse(j);
-        let dbnames = index.names
-        for (const dbname of dbnames) {
+        let dbnames = index.files
+        for (const dbobj of dbnames) {
+            var dbname = dbobj.name
             let path:string = App.workspace + dbname + ".json"
             let j:any = fs.readFileSync(path).toString()
             console.log(`Parsing ${path} ...`);
@@ -38,9 +39,10 @@ export class Database {
         let path:string = App.workspace + "index.json"
         let j:any = fs.readFileSync(path).toString()
         let index = JSON.parse(j);
-        let dbnames = index.names;
-        for (const dbname of dbnames) {
-            
+        let dbnames = index.files;
+        for (const dbobj of dbnames) {
+            if (!dbobj.save) continue
+            var dbname = dbobj.name
             let path:string = App.workspace + dbname + ".json"
             console.log(`Saving ${path} ...`);
             let container:any = Database.db

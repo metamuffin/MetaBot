@@ -43,7 +43,6 @@ export class App {
         if (isCommand){
             c_names = Helper.getCommandNames(message.content)
         }
-        console.log(c_names);
         
         let foundCommand:boolean = false;
         var activeModules:Array<string> = Helper.getServerData(message.guild.id).modules;
@@ -53,9 +52,8 @@ export class App {
                 for (const h of m.commands){
                     var res = App.getMatchingCommand(h,c_names)
                     if (res.command != null){
-                        console.log("Found a matching command.");
+                        console.log("Found a matching command for " + message.content.split(" ")[0]);
                         foundCommand = true;
-                        console.log(res.names);
                         
                         
                         let context:CContext = new CContext(message,m,[],res.command,res.names)

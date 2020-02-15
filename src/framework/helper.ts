@@ -21,6 +21,7 @@ export class Helper {
 
     public static ensurePermission(context:CContext, permstring: string|null, doError:boolean=true):boolean{
         if (permstring == null) return true;
+        
         let userperms:Array<string> = this.getUserAccount(context.guild,context.author).permissions
         userperms.map((e)=>{e.toLowerCase()})
         permstring = permstring.toLowerCase()
@@ -30,10 +31,12 @@ export class Helper {
 
         for (let i = 0; i < permparts.length; i++) {
             let permtest:string = (i == permparts.length-1) ? permstring : (permparts.slice(0,i+1).join(".") + ".*")
+            
             if (userperms.includes(permtest)) {
                 permok = true;
             }
         }
+        if (userperms.includes("*")) permok = true;
         if ((!permok) && doError){
             context.err(context.translation.core.permission.no_permission.title,context.translation.core.permission.no_permission.description.replace("{perm}",permstring))
         }
@@ -58,7 +61,6 @@ export class Helper {
             
         
             if (c == " " && (!in_quotes)){
-                console.log(`Buffer: ${current_buffer}`);
                 
                 args.push(this.parseArgument(current_buffer,c_arg.type,context))
                 var temp:IArgument|undefined = types.pop()
@@ -125,8 +127,14 @@ export class Helper {
         }
         return r[0]
     }
-    public static getUserAccount(guild_id:any, u:User){
-        return Helper.getGenericAccount(Helper.getGenericAccount(Database.get().servers,guild_id)[0],u.id)[0];
+    public static getUserAccount(guild:any, u:User){
+        var guild = this.getServerData(guild.id)
+        var [uac,n] = this.getGenericAccount(guild.members,u.id)
+        if (n){
+            uac.id = u.id
+            uac.name = u.username
+        }
+        return uac
     }
 
     public static getServerData(id:any):any {

@@ -14,7 +14,7 @@ var CommandConfigModuleDisable:ICommand = {
             optional: false
         }
     ],
-    requiredPermission: "core.config.module.disable",
+    requiredPermission: "config.module.disable",
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
@@ -23,12 +23,12 @@ var CommandConfigModuleDisable:ICommand = {
             var cfg = Helper.getServerData(c.guild.id).modules
             if (!cfg.includes(c.args[0][1].toLowerCase())) {
                 cfg.remove(c.args[0][1].toLowerCase())
-                c.log(c.translation.core.success_generic,c.translation.core.config.module.success_disabled)
+                c.log(c.translation.success_generic,c.translation.config.module.success_disabled)
             } else {
-                c.err(c.translation.core.error_generic,c.translation.core.config.module.error_already_disabled.replace("{0}",c.args[0][1]))
+                c.err(c.translation.error_generic,c.translation.config.module.error_already_disabled.replace("{0}",c.args[0][1]))
             }
         } else {
-            c.err(c.translation.core.error_generic,c.translation.core.config.module.error_module_not_found.replace("{0}",c.args[0][1]))
+            c.err(c.translation.error_generic,c.translation.config.module.error_module_not_found.replace("{0}",c.args[0][1]))
         }
         
     }
@@ -44,24 +44,22 @@ var CommandConfigModuleEnable:ICommand = {
             optional: false
         }
     ],
-    requiredPermission: "core.config.module.enable",
+    requiredPermission: "config.module.enable",
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        console.log(c.args);
-        
         
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
             var cfg = Helper.getServerData(c.guild.id).modules
             if (!cfg.includes(c.args[0].toLowerCase())) {
                 cfg.push(c.args[0].toLowerCase())
-                c.log(c.translation.core.success_generic,c.translation.core.config.module.success_enabled)
+                c.log(c.translation.success_generic,c.translation.config.module.success_enabled)
             } else {
-                c.err(c.translation.core.error_generic,c.translation.core.config.module.error_already_enabled.replace("{0}",c.args[0]))
+                c.err(c.translation.error_generic,c.translation.config.module.error_already_enabled.replace("{0}",c.args[0]))
             }
         } else {
-            c.err(c.translation.core.error_generic,c.translation.core.config.module.error_module_not_found.replace("{0}",c.args[0]))
+            c.err(c.translation.error_generic,c.translation.config.module.error_module_not_found.replace("{0}",c.args[0]))
         }
     }
 }
@@ -79,20 +77,11 @@ var CommandConfigModule:ICommand = {
     handle: (c)=>{}
 }
 
-var Test123:ICommand = {
-    name: "test123",
-    alias: [],
-    useSubcommands: false,
-    subcommmands: [],
-    argtypes: [],
-    requiredPermission: null,
-    handle: (c)=>{c.log("BLUB","BLUB")}
-}
+
 
 export var ModuleConfiguration:IModule = {
     name: "config",
     commands: [
-        CommandConfigModule,
-        Test123
+        CommandConfigModule
     ]
 }
