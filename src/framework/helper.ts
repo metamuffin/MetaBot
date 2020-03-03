@@ -1,6 +1,6 @@
 import { Message, User, AudioPlayer } from "discord.js";
 import { Database } from "./database";
-import { CContext, IArgument } from "./command";
+import { Context, IArgument } from "./command";
 import { userInfo } from "os";
 
 
@@ -19,7 +19,7 @@ export class Helper {
         return msg.substr(1,msg.length).split(" ")
     }
 
-    public static ensurePermission(context:CContext, permstring: string|null, doError:boolean=true):boolean{
+    public static ensurePermission(context:Context, permstring: string|null, doError:boolean=true):boolean{
         if (permstring == null) return true;
         
         let userperms:Array<string> = this.getUserAccount(context.guild,context.author).permissions
@@ -43,7 +43,7 @@ export class Helper {
         return permok;
     }
 
-    public static parseArguments(msg:string,types:Array<IArgument>,context:CContext):Array<any> {
+    public static parseArguments(msg:string,types:Array<IArgument>,context:Context):Array<any> {
         types = types.slice(0)
         var c_arg = types.pop() || {type:EType.String,optional:true,name:"unnamed"}
         var in_quotes = false;
@@ -84,7 +84,7 @@ export class Helper {
         return args
     }
 
-    public static parseArgument(buffer:string,type:EType,context:CContext):any|null {
+    public static parseArgument(buffer:string,type:EType,context:Context):any|null {
         var r:any|null = ""
         if (type == EType.String) r = buffer
         if (type == EType.Float) {

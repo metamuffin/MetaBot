@@ -3,7 +3,8 @@ import { IModule } from "../module"
 import { EType } from "../helper"
 import { App } from "../core"
 import { Database } from "../database"
-
+import { exec } from "child_process"
+import * as ts from "typescript"
 
 
 
@@ -69,11 +70,37 @@ var CommandMiscSave:ICommand = {
     }
 }
 
+var CommandMiscEval:ICommand = {
+    name: "eval",
+    alias: ["exec"],
+    argtypes: [
+        {
+            name: "Code",
+            type: EType.String,
+            optional: false
+        }
+    ],
+    subcommmands: [],
+    useSubcommands: false,
+    requiredPermission: "debug.exec",
+    handle: (c) => {
+        var p:any = null;
+        try {
+            p = eval(c.args[0]).toString()
+        } catch (e) {
+            c.err("Error",e)
+        } finally {
+            c.log("",`\`${p}\``)
+        }
+    }
+}
+
 export var ModuleMisc:IModule = {
     name: "misc",
     commands: [
         CommandMiscAbout,
         CommandMiscBlub,
-        CommandMiscSave
+        CommandMiscSave,
+        CommandMiscEval
     ]
 }

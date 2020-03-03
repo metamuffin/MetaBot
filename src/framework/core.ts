@@ -1,9 +1,9 @@
 import { Discord, On, Client, IAppConfig } from "@typeit/discord";
-import { Message } from "discord.js"
+import { Message, ReactionEmoji, MessageReaction, User } from "discord.js"
 import { Database } from "./database";
 import { IModule } from "./module";
 import { Helper } from "./helper";
-import { ICommand, CContext } from "./command";
+import { ICommand, Context } from "./command";
 import { loadNativeCommands } from "./commands/loader";
 
 
@@ -36,6 +36,11 @@ export class App {
         
     }
 
+    @On("messageReactionAdd")
+    public static reactionHandler(reaction:MessageReaction, user:User):void {
+        
+    }
+
     @On("message")
     public static messageHandler(message: Message):void {
         let isCommand:boolean = message.content.startsWith(App.prefix)
@@ -56,7 +61,7 @@ export class App {
                         foundCommand = true;
                         
                         
-                        let context:CContext = new CContext(message,m,[],res.command,res.names)
+                        let context:Context = new Context(message,m,[],res.command,res.names)
                         if (Helper.ensurePermission(context,h.requiredPermission)){
                             console.log("Handling this Command.");
                             res.command.handle(context)

@@ -1,5 +1,5 @@
 import { EType, Helper } from "./helper";
-import { Message, Channel, GuildMember, User, TextChannel, Client, Guild } from "discord.js";
+import { Message, Channel, GuildMember, User, TextChannel, Client, Guild, ColorResolvable } from "discord.js";
 import { IModule } from "./module";
 import { App } from "./core";
 
@@ -17,13 +17,13 @@ export interface ICommand {
     subcommmands:Array<ICommand>,
     requiredPermission:string|null,
 
-    handle: (context: CContext) => void,
+    handle: (context: Context) => void,
     
 
 
 }
 
-export class CContext {
+export class Context {
     public args:Array<any>;
     public channel:TextChannel
     public author:User
@@ -45,27 +45,14 @@ export class CContext {
     }
 
     public log = (title:string,description:string):void => {
-        this.send(title,description,"log")
+        this.send(title,description,0xa70fff)
     }
     
     public err = (title:string,description:string):void => {
-        this.send(title,description,"error")
+        this.send(title,description,0xff0000)
     }
 
-    public send = (title:string,description:string,color:string|number) => {
-        if (typeof color == "string"){
-            switch (color) {
-                case "log":
-                    color = 0xa70fff
-                    break;
-                case "error":
-                    color = 0xff0000
-                    break;
-
-                default:
-                    break;
-            }
-        }
+    public send = (title:string,description:string,color:ColorResolvable) => {
         this.channel.send({embed:{
             color: color,
             title: title,

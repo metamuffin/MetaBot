@@ -1,9 +1,8 @@
 # MetaBot
 
-MetaBot is a High-Level framework for creating Discord-Bots of any kind.
-MetaBot is written in TypeScript, so it can be used with Javascript too.
-
-This Framework is not Finished yet.
+MetaBot is a High-Level framework built on top of discord.js for creating Discord-Bots of any kind.
+It is written in TypeScript, so it can be used with Javascript too.
+*This Framework is not Finished yet so it could be instable*
 
 ## Installation
 
@@ -18,9 +17,10 @@ Run `npm run start` to start the bot in a production mode.
 
 Run `npm run start:dev` to use nodemon for debugging
 
-## Usage
+## Documentation
 
-Documentation is still WIP.
+For a Tutorial look at `/src/modules/tutorialmodule.ts`.
+The documentation is still WIP.
 
 ## Licence
 
