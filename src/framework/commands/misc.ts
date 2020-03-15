@@ -47,12 +47,25 @@ var CommandMiscBlub:ICommand = {
                 }
                 outstr += `**__${mod.name}__**\n`
                 for (const command of mod.commands) {
-                    
-                    outstr += `\u251c\u2500 **${command.name}:** ${c.translation[mod.name][command.name].description || "No Description Specified."}\n`
+                    try{
+                        outstr += `\u251c\u2500 **${command.name}:** ${c.translation[mod.name][command.name].description || "No Description Specified."}\n`
+                    } catch (e) {
+                        c.err("There may be something missing in the help because of an internal error :(",`Error on \`${mod.name}.${command.name}\``)
+                        console.log(`[ERROR] ${command.name}`);
+                    }
                 }
             }
             outstr += "\nMore help can be found with the command: `"+App.prefix+"help <name>`"
             c.log(c.translation.misc.help.title_generic,outstr)
+        } else {
+            for (const mod of App.modules) {
+                if (mod.name = c.args[0]){
+                    
+
+                    
+                    break
+                }
+            }
         }
     }
 }

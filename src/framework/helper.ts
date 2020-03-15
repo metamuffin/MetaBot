@@ -1,4 +1,4 @@
-import { Message, User, AudioPlayer } from "discord.js";
+import { Message, User, AudioPlayer, Guild } from 'discord.js';
 import { Database } from "./database";
 import { Context, IArgument } from "./command";
 import { userInfo } from "os";
@@ -9,7 +9,14 @@ export enum EType {
     Integer,
     Float,
     Command,
-    Member,
+    MemberData,
+}
+
+export class IdentifiedClass {
+    public id:number = 0
+    constructor(){
+        this.id = Math.floor(Math.random()*10**16)
+    }
 }
 
 export class Helper {
@@ -61,8 +68,8 @@ export class Helper {
             
         
             if (c == " " && (!in_quotes)){
-                
-                args.push(this.parseArgument(current_buffer,c_arg.type,context))
+                var parsed = this.parseArgument(current_buffer,c_arg.type,context)
+                args.push(parsed)
                 var temp:IArgument|undefined = types.pop()
                 if (temp == undefined){
                     if (i == msg.length - 1) break
@@ -103,6 +110,22 @@ export class Helper {
                 r = undefined
             }
         }
+        if (type == EType.MemberData) {
+            try {
+                r = parseInt(buffer.trim())
+            } catch (e) {
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
+                r = undefined
+            } finally {
+                console.log(r);
+                r = Helper.getExistingUserAccountById(context.guild,buffer.trim())
+                console.log(r);
+                
+                if (!r) {
+                    context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
+                }
+            }
+        }
         return r
     }
 
@@ -128,13 +151,17 @@ export class Helper {
         return r[0]
     }
     public static getUserAccount(guild:any, u:User){
-        var guild = this.getServerData(guild.id)
-        var [uac,n] = this.getGenericAccount(guild.members,u.id)
+        var guild_data = this.getServerData(guild.id)
+        var [uac,n] = this.getGenericAccount(guild_data.members,u.id)
         if (n){
             uac.id = u.id
             uac.name = u.username
         }
         return uac
+    }
+    public static getExistingUserAccountById(guild:Guild,uid:string): Object | undefined {
+        var guild_data = this.getServerData(guild.id)
+        return guild_data.members[uid]
     }
 
     public static getServerData(id:any):any {

@@ -29,9 +29,11 @@
   "dependencies": {
     "@typeit/discord": "^1.0.3",
     "discord.js": "^11.5.1",
+    "node-opus": "^0.3.3",
     "reflect-metadata": "^0.1.13",
     "tslib": "^1.10.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "ytdl-core": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^13.1.6",
