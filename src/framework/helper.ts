@@ -52,7 +52,7 @@ export class Helper {
 
     public static parseArguments(msg:string,types:Array<IArgument>,context:Context):Array<any> {
         types = types.slice(0)
-        var c_arg = types.pop() || {type:EType.String,optional:true,name:"unnamed"}
+        var c_arg = types.shift() || {type:EType.String,optional:true,name:"unnamed"}
         var in_quotes = false;
         var current_buffer:string = ""
         var args:Array<any> = [];
@@ -70,7 +70,7 @@ export class Helper {
             if (c == " " && (!in_quotes)){
                 var parsed = this.parseArgument(current_buffer,c_arg.type,context)
                 args.push(parsed)
-                var temp:IArgument|undefined = types.pop()
+                var temp:IArgument|undefined = types.shift()
                 if (temp == undefined){
                     if (i == msg.length - 1) break
                     context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.not_enough_args)
@@ -93,7 +93,7 @@ export class Helper {
 
     public static parseArgument(buffer:string,type:EType,context:Context):any|null {
         var r:any|null = ""
-        if (type == EType.String) r = buffer
+        if (type == EType.String) r = buffer.trim()
         if (type == EType.Float) {
             try {
                 r = parseFloat(buffer.trim());
@@ -117,10 +117,12 @@ export class Helper {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
                 r = undefined
             } finally {
-                console.log(r);
-                r = Helper.getExistingUserAccountById(context.guild,buffer.trim())
-                console.log(r);
+                console.log(buffer);
+                console.log(buffer.trim())
                 
+                r = Helper.getExistingUserAccountById(context.guild,buffer.trim())
+                
+
                 if (!r) {
                     context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
                 }

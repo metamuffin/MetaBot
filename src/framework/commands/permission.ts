@@ -25,6 +25,7 @@ var CommandPermissionPermissionAdd:ICommand = {
         if (!c.args[0]) return
         if (!c.args[1]) return
         if (!Helper.ensurePermission(c,c.args[1],true)) return
+        if (c.args[0].permissions.includes(c.args[1])) return c.err("Permission already apllied.","")
         c.args[0].permissions.push(c.args[1])
         c.log(c.translation.permission.permission.success,c.translation.permission.permission.add_success.replace("{0}",c.args[0].name).replace("{1}",c.args[1]));
     }
