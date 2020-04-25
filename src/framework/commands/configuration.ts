@@ -73,7 +73,7 @@ var CommandConfigModule:ICommand = {
         CommandConfigModuleDisable
     ],
     argtypes: [],
-    requiredPermission: null,
+    requiredPermission: "config.module.default",
     handle: (c)=>{}
 }
 

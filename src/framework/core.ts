@@ -48,8 +48,7 @@ export class App {
         if (isCommand){
             c_names = Helper.getCommandNames(message.content)
         }
-        
-        let foundCommand:boolean = false;
+                let foundCommand:boolean = false;
         var activeModules:Array<string> = Helper.getServerData(message.guild.id).modules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;

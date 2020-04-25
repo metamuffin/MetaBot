@@ -1,4 +1,4 @@
 /node_modules
 /build
 /src/modules/*
-!/src/modules/tutorialmodule.ts
+/src/modules/tutorialmodule.ts

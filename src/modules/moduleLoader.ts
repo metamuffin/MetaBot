@@ -3,6 +3,8 @@ import { ModuleTest } from "./testmodule";
 import { ModuleDND } from "./dnd";
 import { ModuleMusic } from "./music";
 import { ModuleTutorial } from "./tutorialmodule"
+import { ModuleCrypto } from "./crypto";
+import { ModuleVoiceAssistant } from './voice-assistant';
 
 export function registerModules():void {
     App.modules.push(
@@ -10,6 +12,8 @@ export function registerModules():void {
         ModuleTest, 
         ModuleDND,
         ModuleMusic,
+        ModuleCrypto,
+        ModuleVoiceAssistant,
         // */
         ModuleTutorial
     )
