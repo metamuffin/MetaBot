@@ -68,6 +68,7 @@ export class Helper {
             
         
             if (c == " " && (!in_quotes)){
+                current_buffer = current_buffer.replace("\"","")
                 var parsed = this.parseArgument(current_buffer,c_arg.type,context)
                 args.push(parsed)
                 var temp:IArgument|undefined = types.shift()
@@ -168,5 +169,13 @@ export class Helper {
 
     public static getServerData(id:any):any {
         return Helper.getGenericAccount(Database.get().servers,id)[0];
+    }
+
+    public static deepGet(obj:any,path:Array<string>){
+        var cur = obj
+        for (const key of path) {
+            cur = cur[key]
+        }
+        return cur
     }
 }

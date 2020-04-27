@@ -1,7 +1,8 @@
 import { IModule } from "../module";
-import { ICommand } from "../command";
+import { ICommand, Context } from "../command";
 import { EType, Helper } from "../helper";
 import { App } from "../core";
+import { Database } from "../database";
 
 
 var CommandConfigModuleDisable:ICommand = {
@@ -64,6 +65,35 @@ var CommandConfigModuleEnable:ICommand = {
     }
 }
 
+
+var CommandConfigurationLanguage:ICommand = {
+    name: "language",
+    alias: ["lang","lg"],
+    requiredPermission: null,
+    argtypes: [
+        {
+            name: "Language Code",
+            optional: false,
+            type: EType.String
+        }
+    ],
+    subcommmands: [],
+    useSubcommands: false,
+    handle: (c:Context) => {
+        var lc = c.args[0]
+        if (Database.get().lang.hasOwnProperty(lc)){
+            c.err("ERROR", "Language Code invalid");
+            return
+        }
+        var ua = Helper.getGlobalUserAccount(c.author)
+        ua.language = lc.toLowerCase();
+        c.log("Settings changed successfully!","The next time you run any command, the language will be updated.");
+        
+    }
+}
+
+
+
 var CommandConfigModule:ICommand = {
     name: "module",
     alias: ["mod"],
@@ -82,6 +112,7 @@ var CommandConfigModule:ICommand = {
 export var ModuleConfiguration:IModule = {
     name: "config",
     commands: [
-        CommandConfigModule
+        CommandConfigModule,
+        CommandConfigurationLanguage
     ]
 }

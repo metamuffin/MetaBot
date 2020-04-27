@@ -77,6 +77,7 @@ export class App {
     }
 
     public static getMatchingCommand(command:ICommand, names:Array<string>):{command:ICommand|null,names:Array<string>} {
+        if (!(names && names.length > 0)) return {command:null,names:[]};
         if (!((command.name == names[0].toLowerCase()) || (command.alias.includes(names[0].toLowerCase())))) return {command:null,names:[]};
         
         var names_shifted:Array<string> = names.slice(0)

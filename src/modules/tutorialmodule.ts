@@ -7,6 +7,12 @@ import { ICommand } from "../framework/command";
 
 */
 
+interface MeinInterface {
+    x: number,
+    y: string
+}
+
+
 var CommandTutorialPing:ICommand = {// Naming-style of commands should be: Command<module><name> with <name> being the name of the command and <module> being the name of the module the command belongs to.
     name: "ping",                   // the name of this command will also be one way to call it. 
     alias: ["pong"],                // Alternative or shorter form that can be used.

@@ -1,0 +1,222 @@
+import { IModule } from "../framework/module";
+import { VoiceChannel, VoiceConnection, TextChannel, User, StreamDispatcher } from "discord.js";
+import { ICommand } from '../framework/command';
+import { EType, IdentifiedClass, Helper } from '../framework/helper';
+const ytdl = require("ytdl-core")
+
+
+interface PlaylistElement {
+    display: string,
+    url: string
+}
+
+
+export class MusicPlayer extends IdentifiedClass {
+    public vchannel:VoiceChannel
+    public tchannel:TextChannel
+    public connection:VoiceConnection|undefined = undefined
+    public playlist:Array<PlaylistElement> = []
+    public isPlaying:boolean = false
+    public voters:Array<string> = [];
+    public streamDispatcher:StreamDispatcher|undefined = undefined;
+    public language:string = "en";
+
+    constructor(vchannel:VoiceChannel,tchannel:TextChannel, lang:string){
+        super()
+        this.language = lang
+        this.vchannel = vchannel
+        this.tchannel = tchannel
+        players.push(this)
+        this.create()
+    }
+
+    create(){
+        this.vchannel.join().then((con) => {
+            this.connection = con;
+        })
+    }
+    destroy(){
+        this.connection?.disconnect()
+        players.splice(players.findIndex((e) => { e.id == this.id }))
+    }
+
+    next(){
+        this.voters = []
+        var next = this.playlist.shift()
+        if (!next){
+            this.tchannel.send({embed:{
+                color: 0x00FF00,
+                title: "Queue empty!",
+                description: "Playback stopped"
+            }})
+            this.destroy()
+            return
+        }
+        this.tchannel.send({embed:{
+            color: 0x00FF00,
+            title: next?.display,
+            description: "Now Playing."
+        }})
+
+        this.isPlaying = true;
+        if (!this.connection) this.tchannel.send("Internal Error: 234124325")
+        this.streamDispatcher = this.connection?.playStream(ytdl(next?.url))
+            .on("end",() => {
+                this.isPlaying = false;
+                this.next()
+            })        
+    }
+
+    add(search:string){
+        ytdl.getInfo(search,(err:any,info:any) => {
+            if (err) {
+                console.log(err)
+                this.tchannel.send({embed:{
+                    color:0xFF0000,
+                    title: "ERROOOOOOOOOOOOOOOR",
+                    description: "Uff..."
+                }})
+                return
+            };
+            if (this.isPlaying){
+                this.tchannel.send({embed:{
+                    color: 0x00FF00,
+                    title: info.player_response.videoDetails.title,
+                    description: "Playback scheduled."
+                }})
+            }
+            this.playlist.push({
+                display: info.player_response.videoDetails.title,
+                url: info.video_url
+            })
+
+            
+            this.ensurePlaying()
+        })
+    }
+
+    voteskip(user:User){
+        if (!this.isPlaying){
+            this.tchannel.send({embed:{
+                color:0xFF0000,
+                title: "Error",
+                description: "Nothing is currently playing."
+            }})
+            return
+        }
+        if (this.voters.includes(user.id)){
+            this.tchannel.send({embed:{
+                color:0xFF0000,
+                title: "STOP!",
+                description: "You can only vote once!"
+            }})
+            return
+        }
+        this.voters.push(user.id)
+        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.size / 2)
+        
+        this.tchannel.send({embed:{
+            color:0xFFFF00,
+            title: (skipped) ? "Skipped" : "",
+            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.size / 2)})`
+        }})
+        
+        if (skipped){
+            this.streamDispatcher?.end()
+        }
+        
+    }
+
+    ensurePlaying(){
+        if (!this.isPlaying) this.next()
+    }
+}
+
+var players:Array<MusicPlayer> = []
+
+var getMusicPlayer = (channel:VoiceChannel):MusicPlayer|undefined => {
+    for (const p of players) {
+        if (p.vchannel.id = channel.id) return p
+    }
+    return undefined;
+}
+
+
+var CommandMusicPlay:ICommand = {
+    name: "play",
+    alias: ["p"],
+    argtypes: [
+        {
+            name: "URL / Name",
+            optional: false,
+            type: EType.String
+        }
+    ],
+    requiredPermission: "music.play",
+    subcommmands: [],
+    useSubcommands:false,
+    handle: (c) => {
+        if (c.message.member.voiceChannel) {
+            var player = getMusicPlayer(c.message.member.voiceChannel)
+            if (!player) {
+                player = new MusicPlayer(c.message.member.voiceChannel,c.channel,Helper.getGlobalUserAccount(c.author).language)
+            }
+            player?.add(c.args[0])
+
+        } else {
+            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
+        }
+    }
+}
+
+var CommandMusicSkip:ICommand = {
+    name: "skip",
+    alias: ["n"],
+    argtypes: [],
+    requiredPermission: "music.vote-skip",
+    subcommmands: [],
+    useSubcommands: false,
+    handle: (c) => {
+        if (c.message.member.voiceChannel) {
+            var player = getMusicPlayer(c.message.member.voiceChannel)
+            if (!player) {
+                c.err(c.translation.error,c.translation.music.no_player_found)
+                return
+            }
+            player.voteskip(c.author)
+        } else {
+            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
+        }
+    }
+}
+
+var CommandMusicVolume:ICommand = {
+    name: "skip",
+    alias: ["n"],
+    argtypes: [],
+    requiredPermission: "music.vote-skip",
+    subcommmands: [],
+    useSubcommands: false,
+    handle: (c) => {
+        if (c.message.member.voiceChannel) {
+            var player = getMusicPlayer(c.message.member.voiceChannel)
+            if (!player) {
+                c.err(c.translation.error,c.translation.music.no_player_found)
+                return
+            }
+            player.voteskip(c.author)
+        } else {
+            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
+        }
+    }
+}
+
+
+
+export var ModuleMusic:IModule = {
+    name: "music",
+    commands: [
+        CommandMusicPlay,
+        CommandMusicSkip
+    ]
+}
