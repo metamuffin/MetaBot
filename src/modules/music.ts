@@ -20,6 +20,8 @@ export class MusicPlayer extends IdentifiedClass {
     public voters:Array<string> = [];
     public streamDispatcher:StreamDispatcher|undefined = undefined;
     public language:string = "en";
+    public loop:boolean = false;
+    public currentTitle:PlaylistElement|undefined = undefined
 
     constructor(vchannel:VoiceChannel,tchannel:TextChannel, lang:string){
         super()
@@ -37,7 +39,8 @@ export class MusicPlayer extends IdentifiedClass {
     }
     destroy(){
         this.connection?.disconnect()
-        players.splice(players.findIndex((e) => { e.id == this.id }))
+        var id = this.id
+        setTimeout(function() { players.splice(players.findIndex((e) => { e.id == id })) },0)
     }
 
     next(){
@@ -49,9 +52,14 @@ export class MusicPlayer extends IdentifiedClass {
                 title: "Queue empty!",
                 description: "Playback stopped"
             }})
-            this.destroy()
+            setTimeout(() => {
+                if (!this.isPlaying) this.destroy()
+            },10000)
             return
         }
+        
+        if (this.loop) this.playlist.push( next )
+        
         this.tchannel.send({embed:{
             color: 0x00FF00,
             title: next?.display,
@@ -59,11 +67,14 @@ export class MusicPlayer extends IdentifiedClass {
         }})
 
         this.isPlaying = true;
+        this.currentTitle = next
         if (!this.connection) this.tchannel.send("Internal Error: 234124325")
         this.streamDispatcher = this.connection?.playStream(ytdl(next?.url))
             .on("end",() => {
                 this.isPlaying = false;
+                this.currentTitle = undefined;
                 this.next()
+                
             })        
     }
 
@@ -204,7 +215,37 @@ var CommandMusicVolume:ICommand = {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return
             }
-            player.voteskip(c.author)
+            player.streamDispatcher?.setVolume(1)
+        } else {
+            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
+        }
+    }
+}
+
+
+var CommandMusicLoop:ICommand = {
+    name: "loop",
+    alias: ["lp"],
+    argtypes: [
+        {
+            name: "State",
+            optional: false,
+            type: EType.Boolean
+        }
+    ],
+    requiredPermission: "music.loop",
+    subcommmands: [],
+    useSubcommands: false,
+    handle: (c) => {
+        if (c.message.member.voiceChannel) {
+            var player = getMusicPlayer(c.message.member.voiceChannel)
+            if (!player) {
+                c.err(c.translation.error,c.translation.music.no_player_found)
+                return
+            }
+            player.loop = c.args[0]
+            if (player.isPlaying && player.currentTitle) player.playlist.push(player.currentTitle)
+            c.log("",(c.args[0]) ? c.translation.music.loop.state_updated_enable :  c.translation.music.loop.state_updated_disable)
         } else {
             c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
         }
@@ -217,6 +258,7 @@ export var ModuleMusic:IModule = {
     name: "music",
     commands: [
         CommandMusicPlay,
-        CommandMusicSkip
+        CommandMusicSkip,
+        CommandMusicLoop
     ]
 }

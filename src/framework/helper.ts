@@ -10,6 +10,7 @@ export enum EType {
     Float,
     Command,
     MemberData,
+    Boolean
 }
 
 export class IdentifiedClass {
@@ -118,9 +119,7 @@ export class Helper {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
                 r = undefined
             } finally {
-                console.log(buffer);
-                console.log(buffer.trim())
-                
+
                 r = Helper.getExistingUserAccountById(context.guild,buffer.trim())
                 
 
@@ -128,6 +127,9 @@ export class Helper {
                     context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
                 }
             }
+        }
+        if (type == EType.Boolean) {
+            r = (buffer.trim() == "1" || buffer.trim() == "on" || buffer.trim() == "true" || buffer.trim() == "enable" || buffer.trim() == "enabled")
         }
         return r
     }
