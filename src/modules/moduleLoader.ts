@@ -9,12 +9,12 @@ import { ModuleVoiceAssistant } from './voice-assistant';
 export function registerModules():void {
     App.modules.push(
         // /*
-        ModuleTest, 
         ModuleDND,
-        ModuleMusic,
         ModuleCrypto,
-        ModuleVoiceAssistant,
         // */
+        ModuleTest, 
+        ModuleMusic,
+        ModuleVoiceAssistant,
         ModuleTutorial
     )
 }
