@@ -1,7 +1,8 @@
 import { Message, User, AudioPlayer, Guild } from 'discord.js';
 import { Database } from "./database";
-import { Context, IArgument } from "./command";
+import { CommandContext, IArgument } from "./command";
 import { userInfo } from "os";
+import { GenericContext } from './context';
 
 
 export enum EType {
@@ -27,7 +28,7 @@ export class Helper {
         return msg.substr(1,msg.length).split(" ")
     }
 
-    public static ensurePermission(context:Context, permstring: string|null, doError:boolean=true):boolean{
+    public static ensurePermission(context:GenericContext, permstring: string|null, doError:boolean=true):boolean{
         if (permstring == null) return true;
         
         let userperms:Array<string> = this.getUserAccount(context.guild,context.author).permissions
@@ -51,7 +52,7 @@ export class Helper {
         return permok;
     }
 
-    public static parseArguments(msg:string,types:Array<IArgument>,context:Context):Array<any> {
+    public static parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Array<any> {
         types = types.slice(0)
         var c_arg = types.shift() || {type:EType.String,optional:true,name:"unnamed"}
         var in_quotes = false;
@@ -93,7 +94,7 @@ export class Helper {
         return args
     }
 
-    public static parseArgument(buffer:string,type:EType,context:Context):any|null {
+    public static parseArgument(buffer:string,type:EType,context:GenericContext):any|null {
         var r:any|null = ""
         if (type == EType.String) r = buffer.trim()
         if (type == EType.Float) {

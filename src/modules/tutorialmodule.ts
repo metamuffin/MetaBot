@@ -36,6 +36,7 @@ export var ModuleTutorial:IModule = {
     name: "tutorial", // Names of Modules are always snake_case.
     commands: [ // A List of all Top-Level commands that belong to this Module
         CommandTutorialPing
-    ]
+    ],
+    handlers: []
 }
 

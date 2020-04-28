@@ -1,5 +1,5 @@
 import { VoidCallback } from "./types";
-import { Context } from "./command";
+import { CommandContext } from "./command";
 import { Message, ColorResolvable, MessageReaction, User } from "discord.js";
 import { IdentifiedClass } from "./helper";
 
@@ -18,7 +18,7 @@ export type InterfaceOptionList = Array<InterfaceOption>;
 
 
 export class Interface extends IdentifiedClass {
-    public context:Context
+    public context:CommandContext
     public prompt:string
     public options:InterfaceOptionList
     public config:InterfaceConfig
@@ -26,7 +26,7 @@ export class Interface extends IdentifiedClass {
 
     public message:Message|null = null
 
-    constructor(context_:Context,prompt_:string,options_:InterfaceOptionList,config_:InterfaceConfig) {
+    constructor(context_:CommandContext,prompt_:string,options_:InterfaceOptionList,config_:InterfaceConfig) {
         super()
         this.context = context_
         this.prompt = prompt_

@@ -3,8 +3,9 @@ import { Message, ReactionEmoji, MessageReaction, User } from "discord.js"
 import { Database } from "./database";
 import { IModule } from "./module";
 import { Helper } from "./helper";
-import { ICommand, Context } from "./command";
+import { ICommand, CommandContext} from './command';
 import { loadNativeCommands } from "./commands/loader";
+import { HandlerContext } from "./handler";
 
 
 @Discord
@@ -60,13 +61,21 @@ export class App {
                         foundCommand = true;
                         
                         
-                        let context:Context = new Context(message,m,[],res.command,res.names)
+                        let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
                         if (Helper.ensurePermission(context,h.requiredPermission)){
                             console.log("Handling this Command.");
                             res.command.handle(context)
                         } else {
                             console.log("Permission denied.");
                         }
+                    }
+                }
+            }
+            for (const handler of m.handlers) {
+                if (message.content && handler.regex.test(message.content)){
+                    var context = new HandlerContext(message,handler)
+                    if (Helper.ensurePermission(context,handler.enablePermission,handler.doPermissionError) && (!Helper.ensurePermission(context,handler.disablePermission,false))) {
+                        handler.handle(context)
                     }
                 }
             }

@@ -133,5 +133,6 @@ export var ModuleVoiceAssistant:IModule = {
     commands: [
         CommandVoiceAssistantStart,
         CommandVoiceAssistantStop
-    ]
+    ],
+    handlers: []
 }

@@ -1,5 +1,5 @@
 import { IModule } from "../module";
-import { ICommand, Context } from "../command";
+import { ICommand, CommandContext } from "../command";
 import { EType, Helper } from "../helper";
 import { App } from "../core";
 import { Database } from "../database";
@@ -79,7 +79,7 @@ var CommandConfigurationLanguage:ICommand = {
     ],
     subcommmands: [],
     useSubcommands: false,
-    handle: (c:Context) => {
+    handle: (c:CommandContext) => {
         var lc = c.args[0]
         if (Database.get().lang.hasOwnProperty(lc)){
             c.err("ERROR", "Language Code invalid");
@@ -114,5 +114,6 @@ export var ModuleConfiguration:IModule = {
     commands: [
         CommandConfigModule,
         CommandConfigurationLanguage
-    ]
+    ],
+    handlers: []
 }

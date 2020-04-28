@@ -97,5 +97,6 @@ export var ModulePermission:IModule = {
     name: "permission",
     commands: [
         CommandPermissionPermission
-    ]
+    ],
+    handlers: []
 }

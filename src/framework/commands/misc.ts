@@ -141,5 +141,6 @@ export var ModuleMisc:IModule = {
         CommandMiscBlub,
         CommandMiscSave,
         CommandMiscEval
-    ]
+    ],
+    handlers: []
 }

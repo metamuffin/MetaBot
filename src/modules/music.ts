@@ -260,5 +260,8 @@ export var ModuleMusic:IModule = {
         CommandMusicPlay,
         CommandMusicSkip,
         CommandMusicLoop
+    ],
+    handlers: [
+        
     ]
 }
