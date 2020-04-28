@@ -4,6 +4,14 @@ MetaBot is a High-Level framework built on top of discord.js for creating Discor
 It is written in TypeScript, so it can be used with Javascript too.
 *This Framework is not Finished yet so it could be instable*
 
+## Features
+
+- Command/Handler structure with modules
+- JSON-Database
+- Translation and Multi-Language support (If somebody was to translate it)
+- Permission management
+- Argument parsing with multiple data-types
+
 ## Installation
 
 Download the repo and add your code to the source.
@@ -19,7 +27,7 @@ Run `npm run start:dev` to use nodemon for debugging
 
 ## Documentation
 
-For a Tutorial look at `/src/modules/tutorialmodule.ts`.
+For a short tutorial and exampleof the basic concept look at `/src/modules/tutorialmodule.ts`.
 The documentation is still WIP.
 
 ## Licence
