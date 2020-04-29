@@ -37,6 +37,9 @@ export var ModuleTutorial:IModule = {
     commands: [ // A List of all Top-Level commands that belong to this Module
         CommandTutorialPing
     ],
-    handlers: []
+    handlers: [],
+    init: () => {
+        
+    }
 }
 

@@ -53,5 +53,8 @@ export var ModuleTest:IModule = {
         CommandTestGetPerm,
         CommandTestInterface
     ],
-    handlers: []
+    handlers: [],
+    init: () => {
+        
+    }
 }
