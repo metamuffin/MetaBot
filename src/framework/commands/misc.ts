@@ -28,7 +28,7 @@ var CommandMiscAbout:ICommand = {
 }
 
 
-var CommandMiscBlub:ICommand = {
+var CommandMiscHelp:ICommand = {
     name: "help",
     alias: ["h"],
     useSubcommands: false,
@@ -142,9 +142,12 @@ export var ModuleMisc:IModule = {
     name: "misc",
     commands: [
         CommandMiscAbout,
-        CommandMiscBlub,
+        CommandMiscHelp,
         CommandMiscSave,
         CommandMiscEval
     ],
-    handlers: []
+    handlers: [],
+    init: () => {
+        
+    }
 }

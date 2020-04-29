@@ -18,7 +18,7 @@ export function moderatorWarn(c:GenericContext, reason:string){
     c.send("Verwarnung!",reason,0xFF0000)
 
     if (uac.warnings >= 3) {
-        
+        c.channel.memberPermissions(c.author)
     }
 }
 
@@ -41,7 +41,7 @@ var HandlerModeratorBlacklist:IHandler = {
     handle: (c) => {
         if (!c.message.content) return
         for (const item of Database.get().blacklist.general) {
-            var regexp = new RegExp(item)
+            var regexp = new RegExp(item,"i")
             if (regexp.test(c.message.content)) {
                 c.message.delete()
                 moderatorWarn(c,c.translation.moderator.blacklist.blacklist_violation)
@@ -54,20 +54,13 @@ var HandlerModeratorBlacklist:IHandler = {
 
 var HandlerModeratorLinks:IHandler = {
     name: "links",
-    regex: /https?:\/\/.+\..+/,
-    disablePermission: "moderator.use_links",
+    regex: /https?:\/\/\.+discord\.gg\/\.+/,
+    disablePermission: "moderator.discord_invite",
     enablePermission: null,
     doPermissionError: false,
     handle: (c) => {
-        if (!c.message.content) return
-        for (const item of Database.get().blacklist.general) {
-            var regexp = new RegExp(item)
-            if (regexp.test(c.message.content)) {
-                c.message.delete()
-                moderatorWarn(c,c.translation.moderator.blacklist.blacklist_violation)
-                return
-            }
-        }
+        c.message.delete()
+        moderatorWarn(c,c.translation.moderator.blacklist.invite_pasted)
     }
 
 }
@@ -82,5 +75,8 @@ export var ModuleModerator:IModule = {
     handlers: [
         HandlerModeratorBlacklist,
         HandlerModeratorLinks
-    ]
+    ],
+    init: () => {
+        
+    }
 }

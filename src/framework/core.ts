@@ -34,7 +34,9 @@ export class App {
             `${__dirname}/*Discord.ts`
         );
         Database.get().bot.token = "THIS WAS DELETED.... HAHAHAHAA"
-        
+        for (const mod of App.modules) {
+            setTimeout(mod.init,0)
+        }
     }
 
     @On("messageReactionAdd")

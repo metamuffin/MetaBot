@@ -263,5 +263,8 @@ export var ModuleMusic:IModule = {
     ],
     handlers: [
         
-    ]
+    ],
+    init: () => {
+        
+    }
 }

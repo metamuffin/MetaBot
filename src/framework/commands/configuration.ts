@@ -115,5 +115,8 @@ export var ModuleConfiguration:IModule = {
         CommandConfigModule,
         CommandConfigurationLanguage
     ],
-    handlers: []
+    handlers: [],
+    init: () => {
+        
+    }
 }
