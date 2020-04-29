@@ -19,11 +19,11 @@ In a future version a public npm-package will be created
 
 ## Commands
 
-Run `npm run build` to build
+Run `npm run build` to build.
 
 Run `npm run start` to start the bot in a production mode.
 
-Run `npm run start:dev` to use nodemon for debugging
+Run `npm run start:dev` to use nodemon for debugging and live-reload.
 
 ## Documentation
 

@@ -44,6 +44,7 @@ export class App {
 
     @On("message")
     public static messageHandler(message: Message):void {
+        if (message.author.id == App.client.user.id) return
         let isCommand:boolean = message.content.startsWith(App.prefix)
         let c_names:Array<string> = [];
         if (isCommand){

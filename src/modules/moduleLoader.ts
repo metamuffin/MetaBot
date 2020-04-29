@@ -5,6 +5,7 @@ import { ModuleMusic } from "./music";
 import { ModuleTutorial } from "./tutorialmodule"
 import { ModuleCrypto } from "./crypto";
 import { ModuleVoiceAssistant } from './voice-assistant';
+import { ModuleModerator } from "./moderator";
 
 export function registerModules():void {
     App.modules.push(
@@ -15,6 +16,7 @@ export function registerModules():void {
         ModuleTest, 
         ModuleMusic,
         ModuleVoiceAssistant,
-        ModuleTutorial
+        ModuleTutorial,
+        ModuleModerator
     )
 }

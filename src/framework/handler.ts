@@ -5,11 +5,11 @@ import { Message } from 'discord.js';
 
 export interface IHandler {
     name: string,
-    enablePermission: string,
-    disablePermission: string,
+    enablePermission: string|null,
+    disablePermission: string|null,
     doPermissionError: boolean,
     regex: RegExp,
-    handle: (context: HandlerContext)=>string
+    handle: (context: HandlerContext)=>void
 }
 
 

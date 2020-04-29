@@ -20,10 +20,10 @@ var CommandConfigModuleDisable:ICommand = {
     useSubcommands: false,
     handle: (c) => {
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
-        if (modlist.includes(c.args[0][1].toLowerCase())) {
+        if (modlist.includes(c.args[0].toLowerCase())) {
             var cfg = Helper.getServerData(c.guild.id).modules
-            if (!cfg.includes(c.args[0][1].toLowerCase())) {
-                cfg.remove(c.args[0][1].toLowerCase())
+            if (!cfg.includes(c.args[0].toLowerCase())) {
+                cfg.remove(c.args[0].toLowerCase())
                 c.log(c.translation.success_generic,c.translation.config.module.success_disabled)
             } else {
                 c.err(c.translation.error_generic,c.translation.config.module.error_already_disabled.replace("{0}",c.args[0][1]))

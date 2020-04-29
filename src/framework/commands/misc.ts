@@ -18,7 +18,11 @@ var CommandMiscAbout:ICommand = {
     argtypes: [],
     requiredPermission: null,
     handle: (c) => {
-        c.log("About","This bot was made using the MetaBot-Framework.")
+        var out = "";
+        out += "This Bot is powered by MetaBot by MetaMuffin.\n"
+        out += "MetaBot is a open-source (GNU GPL v3) framework that makes creating bots easier by handling stuff like permissions, modules, data-storage and more.\n"
+        out += "See the source, issue-tracker, feauture-suggestions and documentaion on https://www.github.com/MetaMuffin/MetaBot"
+        c.log("About",out)
     }
     
 }
