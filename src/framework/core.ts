@@ -6,6 +6,7 @@ import { Helper } from "./helper";
 import { ICommand, CommandContext} from './command';
 import { loadNativeCommands } from "./commands/loader";
 import { HandlerContext } from "./handler";
+import { InterfaceHandler } from "./interfacing";
 
 
 @Discord
@@ -41,18 +42,22 @@ export class App {
 
     @On("messageReactionAdd")
     public static reactionHandler(reaction:MessageReaction, user:User):void {
-        
+        InterfaceHandler.onReaction(reaction,user)
     }
 
     @On("message")
     public static messageHandler(message: Message):void {
         if (message.author.id == App.client.user.id) return
+        
+        if (InterfaceHandler.onMessage(message)) return        
+
         let isCommand:boolean = message.content.startsWith(App.prefix)
         let c_names:Array<string> = [];
         if (isCommand){
             c_names = Helper.getCommandNames(message.content)
         }
-                let foundCommand:boolean = false;
+        
+        let foundCommand:boolean = false;
         var activeModules:Array<string> = Helper.getServerData(message.guild.id).modules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
@@ -62,8 +67,7 @@ export class App {
                     if (res.command != null){
                         console.log("Found a matching command for " + message.content.split(" ")[0]);
                         foundCommand = true;
-                        
-                        
+
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
                         if (Helper.ensurePermission(context,h.requiredPermission)){
                             console.log("Handling this Command.");

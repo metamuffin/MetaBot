@@ -1,6 +1,7 @@
 import { IModule } from "../framework/module";
 import { ICommand } from "../framework/command";
 import { Helper } from "../framework/helper";
+import { SelectUI } from "../framework/interfacing";
 
 
 
@@ -40,7 +41,27 @@ var CommandTestInterface:ICommand = {
     argtypes: [],
     requiredPermission: null,
     handle: (c) => {
-        
+        var respond = (choice:string) => {
+            c.log("",`Du hast ${choice} gewählt.`)
+        }
+        var ui = new SelectUI(c,"Wähle eine Frucht!",[
+            {
+                icon: "apple",
+                text: "Apfel",
+                unicode: "",
+                callback: () => {respond("Apfel")}
+            },
+            {
+                icon: "cherries",
+                text: "Kirschen",
+                unicode: "",
+                callback: () => {respond("Kirschen")}
+            }
+        ], {
+            color: 0xFFFF00,
+            public: false
+        })
+        ui.send()
     
     }
 }
