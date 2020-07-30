@@ -1,6 +1,6 @@
-import { IModule } from '../module';
-import { ICommand } from '../command';
-import { EType, Helper } from '../helper';
+import { IModule } from '../module.ts';
+import { ICommand } from '../command.ts';
+import { EType, Helper } from '../helper.ts';
 
 
 var CommandPermissionPermissionAdd:ICommand = {

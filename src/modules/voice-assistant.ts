@@ -1,8 +1,9 @@
-import { IModule } from "../framework/module";
-import { VoiceChannel, VoiceConnection, TextChannel, User, AudioPlayer, VoiceReceiver } from "discord.js";
-import { ICommand } from '../framework/command';
-import { EType, IdentifiedClass } from '../framework/helper';
-import { App } from "../framework/core";
+import { IModule } from "../framework/module.ts";
+import { ICommand } from '../framework/command.ts';
+import { EType, IdentifiedClass } from '../framework/helper.ts';
+import { App } from "../framework/core.ts";
+import { VoiceChannel } from "../api/channel.ts";
+import { TextChannel } from "../api/channel.ts";
 
 interface PlaylistElement {
     display: string,
@@ -135,7 +136,7 @@ export var ModuleVoiceAssistant:IModule = {
         CommandVoiceAssistantStop
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

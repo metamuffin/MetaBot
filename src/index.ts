@@ -1,6 +1,6 @@
 console.log("Started. -> Importing");
-import { App } from "./framework/core";
-import { registerModules } from "./modules/moduleLoader";
+import { App } from "./framework/core.ts";
+import { registerModules } from "./modules/moduleLoader.ts";
 console.log("Imported. -> Logging in");
 
 

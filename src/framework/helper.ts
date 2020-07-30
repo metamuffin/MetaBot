@@ -1,9 +1,6 @@
-import { Message, User, AudioPlayer, Guild } from 'discord.js';
-import { Database } from "./database";
-import { CommandContext, IArgument } from "./command";
-import { userInfo } from "os";
-import { GenericContext } from './context';
-
+import { Database } from "./database.ts";
+import { CommandContext, IArgument } from "./command.ts";
+import { GenericContext } from './context.ts';
 
 export enum EType {
     String,

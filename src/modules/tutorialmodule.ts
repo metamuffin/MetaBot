@@ -1,5 +1,5 @@
-import { IModule } from "../framework/module";
-import { ICommand } from "../framework/command";
+import { IModule } from "../framework/module.ts";
+import { ICommand } from "../framework/command.ts";
 
 /*
 ! MetaBot Tutorial
@@ -38,7 +38,7 @@ export var ModuleTutorial:IModule = {
         CommandTutorialPing
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

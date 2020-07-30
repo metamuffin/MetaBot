@@ -1,5 +1,4 @@
-import { GenericContext } from './context';
-import { Message } from 'discord.js';
+import { GenericContext } from './context.ts';
 
 
 

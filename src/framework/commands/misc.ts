@@ -1,10 +1,8 @@
-import { ICommand } from "../command"
-import { IModule } from "../module"
-import { EType, Helper } from "../helper"
-import { App } from "../core"
-import { Database } from "../database"
-import { exec } from "child_process"
-import * as ts from "typescript"
+import { ICommand } from "../command.ts"
+import { IModule } from "../module.ts"
+import { EType, Helper } from "../helper.ts"
+import { App } from "../core.ts"
+import { Database } from "../database.ts"
 
 
 
@@ -20,11 +18,11 @@ var CommandMiscAbout:ICommand = {
     handle: (c) => {
         var out = "";
         out += "This Bot is powered by MetaBot by MetaMuffin.\n"
-        out += "MetaBot is a open-source (GNU GPL v3) framework that makes creating bots easier by handling stuff like permissions, modules, data-storage and more.\n"
-        out += "See the source, issue-tracker, feauture-suggestions and documentaion on https://www.github.com/MetaMuffin/MetaBot"
+        out += "MetaBot is a open-source framework that makes creating bots easier by handling stuff like permissions, modules, data-storage and more.\n"
+        out += "MetaBot is licenced under the GNU General Public Licence Version 3, so feel free to contribute or modify this project.\n"
+        out += "See the source, issue-tracker, feauture-suggestions and documentation on https://www.github.com/MetaMuffin/MetaBot !"
         c.log("About",out)
     }
-    
 }
 
 

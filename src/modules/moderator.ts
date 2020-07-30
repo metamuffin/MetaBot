@@ -1,9 +1,8 @@
-import { IModule } from '../framework/module';
-import { IHandler } from '../framework/handler';
-import { Database } from '../framework/database';
-import { User, Guild } from 'discord.js';
-import { Helper } from '../framework/helper';
-import { GenericContext } from '../framework/context';
+import { IModule } from '../framework/module.ts';
+import { IHandler } from '../framework/handler.ts';
+import { Database } from '../framework/database.ts';
+import { Helper } from '../framework/helper.ts';
+import { GenericContext } from '../framework/context.ts';
 
 
 export function moderatorWarn(c:GenericContext, reason:string){
@@ -76,7 +75,7 @@ export var ModuleModerator:IModule = {
         HandlerModeratorBlacklist,
         HandlerModeratorLinks
     ],
-    init: () => {
+    init: async () => {
         
     }
 }

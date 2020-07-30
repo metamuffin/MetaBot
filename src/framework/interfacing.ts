@@ -1,8 +1,10 @@
-import { VoidCallback } from "./types";
-import { CommandContext } from "./command";
-import { Message, ColorResolvable, MessageReaction, User, Client } from "discord.js";
-import { IdentifiedClass } from "./helper";
-import { App } from "./core";
+import { VoidCallback } from "./types.ts";
+import { CommandContext } from "./command.ts";
+import { IdentifiedClass } from "./helper.ts";
+import { App } from "./core.ts";
+import { MessageReaction } from "../api/reaction.ts";
+import { Message } from "../api/message.ts";
+import { User } from "../api/user.ts";
 
 
 export interface SelectUIOption {
@@ -54,7 +56,7 @@ export class SelectUI extends GenericUI {
             messageContent += `\n${optionCounter+1}. :${option.icon}: ${option.text}`        
         }
         
-        this.context.channel.send({embed:{
+        var message = await this.context.channel.send({embed:{
             color: this.config.color,
             title: this.prompt,
             description: messageContent,

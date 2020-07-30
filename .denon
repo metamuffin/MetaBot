@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "start": {
+      "cmd": "deno run src/index.ts",
+      "desc": "Run",
+      "unstable": true
+    }
+  },
+  "allow": [
+    "read",
+    "net",
+    "env"
+  ]
+}

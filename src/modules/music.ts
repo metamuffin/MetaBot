@@ -1,8 +1,8 @@
-import { IModule } from "../framework/module";
-import { VoiceChannel, VoiceConnection, TextChannel, User, StreamDispatcher } from "discord.js";
-import { ICommand } from '../framework/command';
-import { EType, IdentifiedClass, Helper } from '../framework/helper';
-const ytdl = require("ytdl-core")
+import { IModule } from "../framework/module.ts";
+import { ICommand } from '../framework/command.ts';
+import { EType, IdentifiedClass, Helper } from '../framework/helper.ts';
+import { VoiceChannel, TextChannel } from "../api/channel.ts";
+const ytdl:any = null
 
 
 interface PlaylistElement {
@@ -32,18 +32,18 @@ export class MusicPlayer extends IdentifiedClass {
         this.create()
     }
 
-    create(){
+    async create(){
         this.vchannel.join().then((con) => {
             this.connection = con;
         })
     }
-    destroy(){
+    async destroy(){
         this.connection?.disconnect()
         var id = this.id
         setTimeout(function() { players.splice(players.findIndex((e) => { e.id == id })) },0)
     }
 
-    next(){
+    async next(){
         this.voters = []
         var next = this.playlist.shift()
         if (!next){
@@ -78,7 +78,7 @@ export class MusicPlayer extends IdentifiedClass {
             })        
     }
 
-    add(search:string){
+    async add(search:string){
         ytdl.getInfo(search,(err:any,info:any) => {
             if (err) {
                 console.log(err)
@@ -106,7 +106,7 @@ export class MusicPlayer extends IdentifiedClass {
         })
     }
 
-    voteskip(user:User){
+    async voteskip(user:User){
         if (!this.isPlaying){
             this.tchannel.send({embed:{
                 color:0xFF0000,
@@ -138,8 +138,8 @@ export class MusicPlayer extends IdentifiedClass {
         
     }
 
-    ensurePlaying(){
-        if (!this.isPlaying) this.next()
+    async ensurePlaying(){
+        if (!this.isPlaying) await this.next()
     }
 }
 
@@ -167,10 +167,10 @@ var CommandMusicPlay:ICommand = {
     subcommmands: [],
     useSubcommands:false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getMusicPlayer(c.message.author.voiceChannel)
             if (!player) {
-                player = new MusicPlayer(c.message.member.voiceChannel,c.channel,Helper.getGlobalUserAccount(c.author).language)
+                player = new MusicPlayer(c.message.author.voiceChannel,c.channel,Helper.getGlobalUserAccount(c.author).language)
             }
             player?.add(c.args[0])
 
@@ -188,8 +188,8 @@ var CommandMusicSkip:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getMusicPlayer(c.message.author.voiceChannel)
             if (!player) {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return
@@ -209,8 +209,8 @@ var CommandMusicVolume:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getMusicPlayer(c.message.author.voiceChannel)
             if (!player) {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return
@@ -237,8 +237,8 @@ var CommandMusicLoop:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getMusicPlayer(c.message.author.voiceChannel)
             if (!player) {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return
@@ -264,7 +264,7 @@ export var ModuleMusic:IModule = {
     handlers: [
         
     ],
-    init: () => {
+    init: async () => {
         
     }
 }

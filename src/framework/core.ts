@@ -1,12 +1,15 @@
-import { Discord, On, Client, IAppConfig } from "@typeit/discord";
-import { Message, ReactionEmoji, MessageReaction, User } from "discord.js"
-import { Database } from "./database";
-import { IModule } from "./module";
-import { Helper } from "./helper";
-import { ICommand, CommandContext} from './command';
-import { loadNativeCommands } from "./commands/loader";
-import { HandlerContext } from "./handler";
-import { InterfaceHandler } from "./interfacing";
+import { Database } from "./database.ts";
+import { IModule } from "./module.ts";
+import { Helper } from "./helper.ts";
+import { ICommand, CommandContext} from './command.ts';
+import { loadNativeCommands } from "./commands/loader.ts";
+import { HandlerContext } from "./handler.ts";
+import { InterfaceHandler } from "./interfacing.ts";
+import { Client } from "../api/client.ts";
+import { Discord, On } from "../api/api.ts";
+import { MessageReaction } from "../api/reaction.ts";
+import { User } from "../api/user.ts";
+import { Message } from "../api/message.ts";
 
 
 @Discord
@@ -23,21 +26,16 @@ export class App {
     prepare():void {
         App.client = new Client();
 
-        Database.load()
-        Database.startAutosave()
+        // TODO
+        //Database.load()
+        //Database.startAutosave()
 
         loadNativeCommands()
     }
     
     start():void {
-        App.client.login(
-            Database.get().bot.token,
-            `${__dirname}/*Discord.ts`
-        );
-        Database.get().bot.token = "THIS WAS DELETED.... HAHAHAHAA"
-        for (const mod of App.modules) {
-            setTimeout(mod.init,0)
-        }
+        App.client.login(Database.globals.token);
+        App.modules.forEach((mod) => setTimeout(mod.init,0))
     }
 
     @On("messageReactionAdd")

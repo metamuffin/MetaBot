@@ -1,6 +1,9 @@
-import { TextChannel, User, Message, Guild, ColorResolvable } from "discord.js";
-import { IModule } from "./module";
-import { Helper } from "./helper";
+import { IModule } from "./module.ts";
+import { Helper } from "./helper.ts";
+import { Message } from "../api/message.ts";
+import { TextChannel } from "../api/channel.ts";
+import { Guild } from "../api/guild.ts";
+import { User } from "../api/user.ts";
 
 
 export class GenericContext {
