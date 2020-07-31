@@ -18,12 +18,12 @@ var CommandConfigModuleDisable:ICommand = {
     requiredPermission: "config.module.disable",
     subcommmands: [],
     useSubcommands: false,
-    handle: (c) => {
+    handle: async (c) => {
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
-            var cfg = Helper.getServerData(c.guild.id).modules
+            var cfg = (await c.getServerDoc()).modules
             if (!cfg.includes(c.args[0].toLowerCase())) {
-                cfg.remove(c.args[0].toLowerCase())
+                cfg.splice(cfg.findIndex(c.args[0].toLowerCase()))
                 c.log(c.translation.success_generic,c.translation.config.module.success_disabled)
             } else {
                 c.err(c.translation.error_generic,c.translation.config.module.error_already_disabled.replace("{0}",c.args[0][1]))
@@ -48,11 +48,11 @@ var CommandConfigModuleEnable:ICommand = {
     requiredPermission: "config.module.enable",
     subcommmands: [],
     useSubcommands: false,
-    handle: (c) => {
+    handle: async (c) => {
         
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
-            var cfg = Helper.getServerData(c.guild.id).modules
+            var cfg = (await c.getServerDoc()).modules
             if (!cfg.includes(c.args[0].toLowerCase())) {
                 cfg.push(c.args[0].toLowerCase())
                 c.log(c.translation.success_generic,c.translation.config.module.success_enabled)
@@ -79,13 +79,13 @@ var CommandConfigurationLanguage:ICommand = {
     ],
     subcommmands: [],
     useSubcommands: false,
-    handle: (c:CommandContext) => {
+    handle: async (c:CommandContext) => {
         var lc = c.args[0]
-        if (Database.get().lang.hasOwnProperty(lc)){
+        if (await Database.collectionTranslation.find({lang: lc})){
             c.err("ERROR", "Language Code invalid");
             return
         }
-        var ua = Helper.getGlobalUserAccount(c.author)
+        var ua = await c.getAuthorDoc()
         ua.language = lc.toLowerCase();
         c.log("Settings changed successfully!","The next time you run any command, the language will be updated.");
         
@@ -116,7 +116,7 @@ export var ModuleConfiguration:IModule = {
         CommandConfigurationLanguage
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

@@ -5,26 +5,26 @@ import { Helper } from '../framework/helper.ts';
 import { GenericContext } from '../framework/context.ts';
 
 
-export function moderatorWarn(c:GenericContext, reason:string){
-    var uac = Helper.getUserAccount(c.guild,c.author)
-    if (uac.warning_timestamp && uac.warnings > 0){
-        if (uac.warning_timestamp > uac.warnings * (60*60*24)) uac.warnings = 0
+export async function moderatorWarn(c:GenericContext, reason:string){
+    var uac = await c.getAuthorDocForServer()
+    if (uac.warningTimestamp && uac.warnings > 0){
+        if (uac.warningTimestamp > uac.warnings * (60*60*24)) uac.warnings = 0
     }
     if (!uac.warnings) uac.warnings = 0;
     uac.warnings += 1
-    uac.warning_timestamp = Date.now()
+    uac.warningTimestamp = Date.now()
 
     c.send("Verwarnung!",reason,0xFF0000)
 
     if (uac.warnings >= 3) {
-        c.channel.memberPermissions(c.author)
+        //c.channel.memberPermissions(c.author)
     }
 }
 
-export function moderatorGetWarn(c:GenericContext){
-    var uac = Helper.getUserAccount(c.guild,c.author)
-    if (uac.warning_timestamp && uac.warnings > 0){
-        if (uac.warning_timestamp > uac.warnings * (60*60*24)) uac.warnings = 0
+export async function moderatorGetWarn(c:GenericContext){
+    var uac = await c.getAuthorDocForServer()
+    if (uac.warningTimestamp && uac.warnings > 0){
+        if (uac.warningTimestamp > uac.warnings * (60*60*24)) uac.warnings = 0
     }
     return uac.warnings
 }
@@ -37,13 +37,13 @@ var HandlerModeratorBlacklist:IHandler = {
     disablePermission: "moderator.bypass-blacklist.general",
     enablePermission: null,
     doPermissionError: false,
-    handle: (c) => {
+    handle: async (c) => {
         if (!c.message.content) return
-        for (const item of Database.get().blacklist.general) {
+        for (const item of (await c.getServerDoc()).messageBlacklist) {
             var regexp = new RegExp(item,"i")
             if (regexp.test(c.message.content)) {
                 c.message.delete()
-                moderatorWarn(c,c.translation.moderator.blacklist.blacklist_violation)
+                await moderatorWarn(c,c.translation.moderator.blacklist.blacklist_violation)
                 return
             }
         }
@@ -57,9 +57,9 @@ var HandlerModeratorLinks:IHandler = {
     disablePermission: "moderator.discord_invite",
     enablePermission: null,
     doPermissionError: false,
-    handle: (c) => {
+    handle: async (c) => {
         c.message.delete()
-        moderatorWarn(c,c.translation.moderator.blacklist.invite_pasted)
+        await moderatorWarn(c,c.translation.moderator.blacklist.invite_pasted)
     }
 
 }

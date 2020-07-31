@@ -91,10 +91,10 @@ var CommandVoiceAssistantStart:ICommand = {
     subcommmands: [],
     useSubcommands:false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getVoiceAssistantPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getVoiceAssistantPlayer(c.message.author.voiceChannel)
             if (!player) {
-                player = new VoiceAssistantPlayer(c.message.member.voiceChannel,c.channel)
+                player = new VoiceAssistantPlayer(c.message.author.voiceChannel,c.channel)
                 c.log(c.translation.voice_assistant.startva.ok,"")
             }
             player?.start()
@@ -114,8 +114,8 @@ var CommandVoiceAssistantStop:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getVoiceAssistantPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getVoiceAssistantPlayer(c.message.author.voiceChannel)
             if (!player) {
                 c.err(c.translation.error,c.translation.voice_assistant.no_player_found)
                 return

@@ -5,6 +5,7 @@ import { App } from "./core.ts";
 import { MessageReaction } from "../api/reaction.ts";
 import { Message } from "../api/message.ts";
 import { User } from "../api/user.ts";
+import { ColorResolvable } from "../api/misc.ts";
 
 
 export interface SelectUIOption {
@@ -49,7 +50,7 @@ export class SelectUI extends GenericUI {
         this.config = config 
     }
 
-    public send():void {
+    public async send():Promise<void> {
         var messageContent:string = ""
         for (let optionCounter = 0; optionCounter < this.options.length; optionCounter++) {
             const option = this.options[optionCounter];
@@ -60,7 +61,6 @@ export class SelectUI extends GenericUI {
             color: this.config.color,
             title: this.prompt,
             description: messageContent,
-            //timestamp: new Date(),
             footer: {
                 text: ``
             }

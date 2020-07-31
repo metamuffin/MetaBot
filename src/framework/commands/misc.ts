@@ -39,11 +39,11 @@ var CommandMiscHelp:ICommand = {
         }
     ],
     requiredPermission: null,
-    handle: (c) => {
+    handle: async (c) => {
         if (c.args[0] == ""){
             var outstr = ""
             for (const mod of App.modules) {
-                if (!Database.get().servers[c.guild.id].modules.includes(mod.name)){
+                if (!((await c.getServerDoc()).modules.includes(mod.name))){
                     outstr += `~~${mod.name}~~: Not Enabled\n`
                     continue
                 }
@@ -98,18 +98,6 @@ var CommandMiscHelp:ICommand = {
     }
 }
 
-var CommandMiscSave:ICommand = {
-    name: "save",
-    alias: [],
-    argtypes: [],
-    requiredPermission: "misc.save",
-    subcommmands: [],
-    useSubcommands: false,
-    handle: (c) => {
-        Database.save()
-        c.log("","Database is saved.")
-    }
-}
 
 var CommandMiscEval:ICommand = {
     name: "eval",
@@ -141,11 +129,10 @@ export var ModuleMisc:IModule = {
     commands: [
         CommandMiscAbout,
         CommandMiscHelp,
-        CommandMiscSave,
         CommandMiscEval
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

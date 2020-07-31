@@ -1,4 +1,5 @@
 import { GenericContext } from './context.ts';
+import { Message } from '../api/message.ts';
 
 
 

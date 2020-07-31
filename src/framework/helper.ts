@@ -25,10 +25,10 @@ export class Helper {
         return msg.substr(1,msg.length).split(" ")
     }
 
-    public static ensurePermission(context:GenericContext, permstring: string|null, doError:boolean=true):boolean{
+    public static async ensurePermission(context:GenericContext, permstring: string|null, doError:boolean=true):Promise<boolean> {
         if (permstring == null) return true;
         
-        let userperms:Array<string> = this.getUserAccount(context.guild,context.author).permissions
+        let userperms:Array<string> = (await context.getAuthorDocForServer()).permissions
         userperms.map((e)=>{e.toLowerCase()})
         permstring = permstring.toLowerCase()
 
@@ -118,9 +118,8 @@ export class Helper {
                 r = undefined
             } finally {
 
-                r = Helper.getExistingUserAccountById(context.guild,buffer.trim())
+                r = Database.getUserDocForServer(buffer.trim(),context.server.id)
                 
-
                 if (!r) {
                     context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
                 }
@@ -132,44 +131,6 @@ export class Helper {
         return r
     }
 
-    public static getUserTranslation(u:User):any{
-        return Database.get().lang[this.getGlobalUserAccount(u).language]
-    }
-
-    public static getGenericAccount(obj:any,indetifier:any):[any,boolean] {
-        var new_created:boolean = false;
-        if(!obj.hasOwnProperty(indetifier.toString())) {
-            obj[indetifier.toString()] = {...obj.default};
-            new_created = true
-        }
-        return [obj[indetifier.toString()], new_created];
-    }
-
-    public static getGlobalUserAccount(u:User):any{
-        var r = Helper.getGenericAccount(Database.get().members,u.id);
-        if (r[1]){
-            r[0].id = u.id
-            r[0].name = u.username
-        }
-        return r[0]
-    }
-    public static getUserAccount(guild:any, u:User){
-        var guild_data = this.getServerData(guild.id)
-        var [uac,n] = this.getGenericAccount(guild_data.members,u.id)
-        if (n){
-            uac.id = u.id
-            uac.name = u.username
-        }
-        return uac
-    }
-    public static getExistingUserAccountById(guild:Guild,uid:string): Object | undefined {
-        var guild_data = this.getServerData(guild.id)
-        return guild_data.members[uid]
-    }
-
-    public static getServerData(id:any):any {
-        return Helper.getGenericAccount(Database.get().servers,id)[0];
-    }
 
     public static deepGet(obj:any,path:Array<string>){
         var cur = obj

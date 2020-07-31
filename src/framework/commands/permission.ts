@@ -99,7 +99,7 @@ export var ModulePermission:IModule = {
         CommandPermissionPermission
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

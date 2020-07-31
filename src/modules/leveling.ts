@@ -1,5 +1,5 @@
-import { IModule } from '../framework/module';
-import { ICommand } from '../framework/command';
+import { IModule } from '../framework/module.ts';
+import { ICommand } from '../framework/command.ts';
 
 
 
@@ -11,7 +11,7 @@ var CommmandLevelingLevel:ICommand = {
     requiredPermission: "leveling.level.get",
     subcommmands: [],
     useSubcommands: false,
-    handle: (c) => {
+    handle: async (c) => {
         
     }
 }
@@ -32,5 +32,8 @@ var ModuleLeveling:IModule = {
     ],
     handlers: [
 
-    ]
+    ],
+    init: async () => {
+        
+    }
 }

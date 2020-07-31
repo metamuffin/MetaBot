@@ -12,13 +12,13 @@ import { User } from "../api/user.ts";
 import { Message } from "../api/message.ts";
 
 
-@Discord
 export class App {
     public static client: Client;
     public static prefix: string = "}";
     public static workspace: string;
     public static modules: Array<IModule> = [];
 
+    
     setWorkspace(path:string):void {
         App.workspace = path;
     }
@@ -38,12 +38,10 @@ export class App {
         App.modules.forEach((mod) => setTimeout(mod.init,0))
     }
 
-    @On("messageReactionAdd")
     public static reactionHandler(reaction:MessageReaction, user:User):void {
         InterfaceHandler.onReaction(reaction,user)
     }
 
-    @On("message")
     public static messageHandler(message: Message):void {
         if (message.author.id == App.client.user.id) return
         
@@ -56,7 +54,7 @@ export class App {
         }
         
         let foundCommand:boolean = false;
-        var activeModules:Array<string> = Helper.getServerData(message.guild.id).modules;
+        var activeModules:Array<string> = Database.getServerDoc(message.guild.id).enabledModules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
             if (isCommand){

@@ -1,7 +1,8 @@
 import { IModule } from "../framework/module.ts";
 import { ICommand } from '../framework/command.ts';
 import { EType, IdentifiedClass, Helper } from '../framework/helper.ts';
-import { VoiceChannel, TextChannel } from "../api/channel.ts";
+import { VoiceChannel, TextChannel, StreamDispatcher, VoiceConnection } from "../api/channel.ts";
+import { User } from "../api/user.ts";
 const ytdl:any = null
 
 
@@ -33,9 +34,7 @@ export class MusicPlayer extends IdentifiedClass {
     }
 
     async create(){
-        this.vchannel.join().then((con) => {
-            this.connection = con;
-        })
+        this.connection = await this.vchannel.join();
     }
     async destroy(){
         this.connection?.disconnect()
@@ -69,13 +68,13 @@ export class MusicPlayer extends IdentifiedClass {
         this.isPlaying = true;
         this.currentTitle = next
         if (!this.connection) this.tchannel.send("Internal Error: 234124325")
-        this.streamDispatcher = this.connection?.playStream(ytdl(next?.url))
+        /*this.streamDispatcher = this.connection?.playStream(ytdl(next?.url))
             .on("end",() => {
                 this.isPlaying = false;
                 this.currentTitle = undefined;
                 this.next()
                 
-            })        
+            })*/
     }
 
     async add(search:string){
@@ -124,12 +123,12 @@ export class MusicPlayer extends IdentifiedClass {
             return
         }
         this.voters.push(user.id)
-        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.size / 2)
+        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.length / 2)
         
         this.tchannel.send({embed:{
             color:0xFFFF00,
             title: (skipped) ? "Skipped" : "",
-            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.size / 2)})`
+            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.length / 2)})`
         }})
         
         if (skipped){
@@ -166,11 +165,11 @@ var CommandMusicPlay:ICommand = {
     requiredPermission: "music.play",
     subcommmands: [],
     useSubcommands:false,
-    handle: (c) => {
+    handle: async (c) => {
         if (c.message.author.voiceChannel) {
             var player = getMusicPlayer(c.message.author.voiceChannel)
             if (!player) {
-                player = new MusicPlayer(c.message.author.voiceChannel,c.channel,Helper.getGlobalUserAccount(c.author).language)
+                player = new MusicPlayer(c.message.author.voiceChannel,c.channel,await c.getAuthorLang())
             }
             player?.add(c.args[0])
 
