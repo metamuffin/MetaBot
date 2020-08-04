@@ -28,7 +28,6 @@ var CommandTestGetPerm:ICommand = {
     requiredPermission: null,
     handle: (c) => {
         c.log("BLUB","BLUB")
-        Helper.getUserAccount(c.guild,c.author).permissions.push("test.*")
     }
     
 }
@@ -75,7 +74,7 @@ export var ModuleTest:IModule = {
         CommandTestInterface
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

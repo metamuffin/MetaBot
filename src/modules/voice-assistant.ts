@@ -2,7 +2,7 @@ import { IModule } from "../framework/module.ts";
 import { ICommand } from '../framework/command.ts';
 import { EType, IdentifiedClass } from '../framework/helper.ts';
 import { App } from "../framework/core.ts";
-import { VoiceChannel } from "../api/channel.ts";
+import { VoiceChannel, VoiceConnection } from "../api/channel.ts";
 import { TextChannel } from "../api/channel.ts";
 
 interface PlaylistElement {
@@ -42,13 +42,13 @@ export class VoiceAssistantPlayer extends IdentifiedClass {
         
         
         
-        this.vchannel.members.forEach((user) => { 
+        this.vchannel.members.forEach(async (user) => { 
             console.log(user.displayName);
             
-            var receiver = this.connection?.createReceiver()
+            var receiver = await this.connection?.createReceiver()
             console.log();
             
-            receiver?.on("opus",(u,buff) => {
+            receiver?.on("opus",(u:any,buff:any) => {
                 console.log(u);
                 console.log(buff);
                 

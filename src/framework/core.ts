@@ -42,7 +42,7 @@ export class App {
         InterfaceHandler.onReaction(reaction,user)
     }
 
-    public static messageHandler(message: Message):void {
+    public static async messageHandler(message: Message):Promise<void> {
         if (message.author.id == App.client.user.id) return
         
         if (InterfaceHandler.onMessage(message)) return        
@@ -54,7 +54,7 @@ export class App {
         }
         
         let foundCommand:boolean = false;
-        var activeModules:Array<string> = Database.getServerDoc(message.guild.id).enabledModules;
+        var activeModules:Array<string> = (await Database.getServerDoc(message.guild.id)).enabledModules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
             if (isCommand){

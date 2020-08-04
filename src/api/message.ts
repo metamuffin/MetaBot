@@ -21,7 +21,7 @@ export class Message extends HasID{
     async delete():Promise<void> {
 
     }
-    async reply():Promise<Message> {
+    async reply(msg:string):Promise<Message> {
         return new Message()
     }
     async react(s:string) {

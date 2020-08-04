@@ -10,7 +10,7 @@ export class TextChannel extends HasID{
     }
 
     async send(message:any):Promise<Message> {
-
+        return new Message()
     }
 
    
@@ -37,6 +37,10 @@ export class VoiceConnection {
     }
     async playStream(): Promise<StreamDispatcher> {
         return new StreamDispatcher()
+    }
+
+    async createReceiver():Promise<any> {
+
     }
 }
 
