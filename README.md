@@ -20,18 +20,23 @@ This branch of metabot is in active developement for the following goals:
 - Permission management
 - Argument parsing with multiple data-types
 
-## Installation
+## Getting started
 
-Download the repo and add your code to the source.
-In a future version a public npm-package will be created
+### Requirements
+- deno
+- git
+- a local mongodb server
+- A discord application
 
-## Commands
+1. Clone this repository
+    - `git clone https://www.github.com/MetaMuffin/MetaBot.git`
+2. Setup the database with global configurations
+    - Create a file `~/.metabotid` and store your client id of the bot in it. (make sure to not add a linebreak at the end)
+    - Create a file `~/.metabotsecret` and store your client secret in it.
+    - Run `cleandb.sh` from this repo. It will reset your mongo database and store the configuration in the global collection
+3. Run the bot
+    - `run.sh` or `deno run --unstable --allow-read --allow-write --allow-net --allow-plugin src/index.ts`
 
-Run `npm run build` to build.
-
-Run `npm run start` to start the bot in a production mode.
-
-Run `npm run start:dev` to use nodemon for debugging and live-reload.
 
 ## Documentation
 
