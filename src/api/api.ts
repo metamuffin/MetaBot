@@ -1,5 +1,8 @@
 
 
+type HTTPMethod = "GET"|"POST"|"DELETE"|"UPDATE"|"PUT"
+
+
 class API {
     public static endpoint:string = "https://discord.com/api/v6"
 
@@ -12,7 +15,7 @@ class API {
         return s;
     }
 
-    static async apiRequest(path:string,method:string,body:{[key:string]: string}){
+    static async apiRequest(path:string,method:HTTPMethod,body:{[key:string]: string}){
         var params = API.postBody(body);
         var resp = await fetch(API.endpoint + path, {
             method: method,

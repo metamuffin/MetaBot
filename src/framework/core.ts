@@ -23,27 +23,24 @@ export class App {
         App.workspace = path;
     }
 
-    prepare():void {
-        App.client = new Client();
-
+    async init() {
+        await Database.init()
+        App.client = new Client(Database.globals.id,Database.globals.secret);
+        
         // TODO
         //Database.load()
         //Database.startAutosave()
 
         loadNativeCommands()
+        await Promise.all(App.modules.map(m => m.init))
     }
     
-    start():void {
-        App.client.login(Database.globals.token);
-        App.modules.forEach((mod) => setTimeout(mod.init,0))
-    }
-
     public static reactionHandler(reaction:MessageReaction, user:User):void {
         InterfaceHandler.onReaction(reaction,user)
     }
 
     public static async messageHandler(message: Message):Promise<void> {
-        if (message.author.id == App.client.user.id) return
+        if (message.author.id == App.client.user?.id) return
         
         if (InterfaceHandler.onMessage(message)) return        
 

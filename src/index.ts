@@ -11,8 +11,6 @@ registerModules()
 
 
 bot.setWorkspace("../MetaBot-DB/")
-console.log("Preparing...");
-bot.prepare()
 console.log("Starting Bot.");
-
-bot.start()
+await bot.init()
+console.log("Running...");

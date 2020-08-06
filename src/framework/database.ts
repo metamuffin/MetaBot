@@ -8,13 +8,25 @@ import { User } from "../api/user.ts";
 
 export class Database {
     
-    public static globals: any;
-    public static dbclient: MongoClient = new MongoClient();
-    public static db:MongoDatabase = Database.dbclient.database("metabot");
-    public static collectionUser:Collection<UserModel> = Database.db.collection<UserModel>("user")
-    public static collectionServer:Collection<ServerModel> = Database.db.collection<ServerModel>("server")
-    public static collectionGlobal:Collection<GlobalModel> = Database.db.collection<GlobalModel>("global")
-    public static collectionTranslation:Collection<TranslationModel> = Database.db.collection<TranslationModel>("translation")
+    public static globals: GlobalModel;
+    public static dbclient: MongoClient
+    public static db:MongoDatabase
+    public static collectionUser:Collection<UserModel>
+    public static collectionServer:Collection<ServerModel>
+    public static collectionGlobal:Collection<GlobalModel>
+    public static collectionTranslation:Collection<TranslationModel>
+
+    public static async init(){
+        this.dbclient = new MongoClient();
+        this.db = Database.dbclient.database("metabot");
+        this.collectionUser= Database.db.collection<UserModel>("user")
+        this.collectionServer = Database.db.collection<ServerModel>("server")
+        this.collectionGlobal = Database.db.collection<GlobalModel>("global")
+        this.collectionTranslation = Database.db.collection<TranslationModel>("translation")
+        var t = await this.collectionGlobal.findOne({})
+        if (!t) throw new Error("No global config in database");
+        this.globals = t;
+    }
 
     public static async getServerDoc(id:string): Promise<ServerModel> {
         var res: ServerModel|null = await this.collectionServer.findOne({id})

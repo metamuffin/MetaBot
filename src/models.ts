@@ -23,5 +23,6 @@ export interface ServerModel {
 }
 
 export interface GlobalModel {
-
+    id:string
+    secret:string
 }
