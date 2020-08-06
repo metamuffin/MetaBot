@@ -3,7 +3,7 @@
 type HTTPMethod = "GET"|"POST"|"DELETE"|"UPDATE"|"PUT"
 
 
-class API {
+export class API {
     public static endpoint:string = "https://discord.com/api/v6"
 
     static postBody(body:{[key:string]: string}){

@@ -6,7 +6,6 @@ import { loadNativeCommands } from "./commands/loader.ts";
 import { HandlerContext } from "./handler.ts";
 import { InterfaceHandler } from "./interfacing.ts";
 import { Client } from "../api/client.ts";
-import { Discord, On } from "../api/api.ts";
 import { MessageReaction } from "../api/reaction.ts";
 import { User } from "../api/user.ts";
 import { Message } from "../api/message.ts";
@@ -26,11 +25,6 @@ export class App {
     async init() {
         await Database.init()
         App.client = new Client(Database.globals.id,Database.globals.secret);
-        
-        // TODO
-        //Database.load()
-        //Database.startAutosave()
-
         loadNativeCommands()
         await Promise.all(App.modules.map(m => m.init))
     }
