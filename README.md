@@ -25,8 +25,11 @@ This branch of metabot is in active developement for the following goals:
 ### Requirements
 - deno
 - git
-- a local mongodb server
-- A discord application
+- A local mongodb server
+- A discord application with a bot
+- Internet access
+
+*These instructions (and parts of the bot itself) only work Unix-like operating systemes. If you dont have one, you have to figure it out on your own. Good Luck*
 
 1. Clone this repository
     - `git clone https://www.github.com/MetaMuffin/MetaBot.git`
