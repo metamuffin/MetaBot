@@ -8,7 +8,6 @@ It is written in TypeScript, so it can be used with Javascript too.
 
 This branch of metabot is in active developement for the following goals:
 - MetaBots own api wrapper
-- Using deno instead of nodejs
 - Using Mongodb instead of json files
 - Use async/await instead of .then().then().then().catch().then()
 
@@ -23,7 +22,7 @@ This branch of metabot is in active developement for the following goals:
 ## Getting started
 
 ### Requirements
-- deno
+- node 10.x
 - git
 - A local mongodb server
 - A discord application with a bot
@@ -37,8 +36,9 @@ This branch of metabot is in active developement for the following goals:
     - Create a file `~/.metabotid` and store your client id of the bot in it. (make sure to not add a linebreak at the end)
     - Create a file `~/.metabotsecret` and store your client secret in it.
     - Run `cleandb.sh` from this repo. It will reset your mongo database and store the configuration in the global collection
-3. Run the bot
-    - `run.sh` or `deno run --unstable --allow-read --allow-write --allow-net --allow-plugin src/index.ts`
+3. Build and Run the bot
+    - `npm run build`
+    - `npm run start`
 
 
 ## Documentation
