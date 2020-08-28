@@ -1,0 +1,129 @@
+{
+  "lang": "en",
+  "error": "Error",
+  "core":{
+    "permission":{
+        "no_permission":{
+          "title":"You don't have to permissions to run this command.",
+          "description":"You need `{perm}` to do it."
+        }
+    },
+    "general":{
+      "command_not_found": "Command not found.",
+      "parse_error":{
+          "title":"Parsing Error!",
+          "float_invalid":"One floating point argument is not a valid number.",
+          "int_invalid":"One integer argument is not a valid number.",
+          "not_enough_args":"You did not specify all the required arguments.",
+          "member_id_not_an_integer":"The specified member-id is not an integer.",
+          "member_not_found": "The member-id you've specified couldn't be found on this server."
+        }
+    }
+  },
+  "misc": {
+    "help": {
+      "description": "Shows the Help",
+      "title_generic": "Help",
+      "help_description": "Description",
+      "help_permission": "Required permission",
+      "help_subcommands": "Subcommands",
+      "none": "None"
+    },
+    "about": {
+      "description": "Shows you some useless information about this bot."
+    },
+    "save": {
+      "description": "Saves the Database."
+    },
+    "eval": {
+      "description": "Evaluates code."
+    }
+  },
+  "permission": {
+    "permission":{
+      "success": "Permission update successful!",
+      "add_success": "`{0}` now has the permission `{1}`",
+      "remove_success": "`{0}` now doesnt have the permission `{1}` anymore.",
+      "description": "Configurate Permissions",
+      "permission_not_found": "The specified user already doesnt have this permission.",
+      "permission_list": "Permission List:"
+    }
+  },
+  "config":{
+    "language": {
+      "description": "Change the language"
+    },
+    "module":{
+      "enable": {
+        "description": "Enables a Module."
+      },
+      "disable": {
+        "description": "Disables a Module."
+      },
+      "description": "Allows you to enable and disabled modules on this server.",
+      "error_module_not_found":"The Module '{0}' couldn't be found.",
+      "error_already_enabled":"The Module '{0}' is already enabled.",
+      "error_already_disabled":"The Module '{0}' is already disabled.",
+      "success_enabled":"The Module is now enabled on this server.",
+      "success_disabled":"The Module is now disabled on this server."
+    }
+  },
+  "test": {
+    "ping": {
+      "description": "Just Pings you."
+    },
+    "getperm": {
+      "description": "Gives you an permission."
+    },
+    "testui": {
+      "description": "Tests if the UI Components work like the should."
+    }
+  },
+  "dnd": {
+    "dice": {
+      "description": "Rolls a dice with the specified amount of numbers for you."
+    },
+    "createmonster": {
+      "description": "Creates a Monster for DND."
+    }
+  },
+  "music": {
+    "play": {
+      "description": "Plays Music",
+      "no_player_found": "No Music Player was found for your current voice channel.",
+      "not_in_a_voicechannel": "You must be in a voice channel to use this command."
+    },
+    "skip": {
+      "description": "Voteskip tracks of the queue"
+    },
+    "loop": {
+      "state_updated_enable": "State Updated. Loop mode Enabled.",
+      "state_updated_disable": "State Updated. Loop mode Disabled.",
+      "description": "Set loop state for music playback."
+    }
+  },
+  "voice_assistant":{
+    "startva": {
+      "ok": "Voice Assistant running.",
+      "description": "Starts the Voice Assistant"
+    },
+    "stopva": {
+      "ok": "Voice Assistant stopped.",
+      "description": "Stops the Voice Assistant"
+    }
+  },
+  "tutorial": {
+    "ping": {
+      "description": "Ping!"
+    }
+  },
+  "moderator": {
+    "warning_title": "Warning!",
+    "warning_description": "You have voilated a rule of this server.",
+    "warning_reason": "Reason:",
+    "blacklist": {
+      "blacklist_violation":"Blacklist regexp triggered.",
+      "invite_pasted": "Pasted a discord invite."
+    }
+  }
+}

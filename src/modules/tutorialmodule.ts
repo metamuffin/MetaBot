@@ -20,7 +20,7 @@ var CommandTutorialPing:ICommand = {// Naming-style of commands should be: Comma
     useSubcommands: false,          // It does not use any subcommands
     subcommmands: [],               // So the the subcommands-array should be empty
     argtypes: [],                   // Arguments are also not required.
-    handle: (context) => {
+    handle: async (context) => {
         /*
             When the Command is called from the chat, the framework will execute this
             function with a instance of the Context that includes information about the
@@ -28,7 +28,7 @@ var CommandTutorialPing:ICommand = {// Naming-style of commands should be: Comma
         */
         // the 'log' function logs embeded messages in reply to the message that called the command
         // Usage: context.log(<title>,<description>)
-        context.log("Pong!","It looks like this Command Worked.") // TODO: You should use the translation database for these logs!
+        await context.log("Pong!","It looks like this Command Worked.") // TODO: You should use the translation database for these logs!
     }
 }
 
@@ -38,7 +38,7 @@ export var ModuleTutorial:IModule = {
         CommandTutorialPing
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

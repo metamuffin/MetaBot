@@ -1,65 +1,134 @@
-import * as fs from 'fs';
-import { App } from './core';
 
+import { App } from './core';
+import { UserModel, ServerModel, GlobalModel, UserModelForServer } from "../models";
+import {User} from "discord.js"
+import {MongoClient,Db,Collection} from "mongodb"
+import { create } from 'domain';
+import { Server } from 'http';
+import { readFile } from 'fs/promises';
+import { readFileSync } from 'fs';
+import { TranslationModel } from '../translation';
+
+const VERBOSE_DATABASE_LOGS = false;
 
 
 export class Database {
+    
+    public static globals: GlobalModel;
+    public static dbclient: MongoClient
+    public static db: Db;
+    public static collectionUser:Collection<UserModel>
+    public static collectionServer:Collection<ServerModel>
+    public static collectionGlobal:Collection<GlobalModel>
+    public static collectionTranslation:Collection<TranslationModel>
 
-    private static db:any = {}
-
-    static load():void {
-        let path:string = App.workspace + "index.json"
-        let j:any = fs.readFileSync(path).toString()
-        let index = JSON.parse(j);
-        let dbnames = index.files
-        for (const dbobj of dbnames) {
-            var dbname = dbobj.name
-            let path:string = App.workspace + dbname + ".json"
-            let j:any = fs.readFileSync(path).toString()
-            console.log(`Parsing ${path} ...`);
-            let obj = JSON.parse(j);
-            
-            let createpath:Array<string> = dbname.split("/")
-            let container:any = Database.db;
-            for (let i = 0; i < createpath.length; i++) {
-                const e = createpath[i];
-                if (!container.hasOwnProperty(e)) container[e] = {}
-                if (i >= (createpath.length - 1) ) break;
-                container = container[e]
-            }
-            
-            container[createpath.pop()||"ERROR"] = obj
-        }
-    }
-    static get():any {
-        return Database.db;
+    public static async init(){
+        this.dbclient = new MongoClient("mongodb://localhost:27017/metabot");
+        await this.dbclient.connect()
+        this.db = Database.dbclient.db("metabot")
+        this.collectionUser= Database.db.collection<UserModel>("user")
+        this.collectionServer = Database.db.collection<ServerModel>("server")
+        this.collectionGlobal = Database.db.collection<GlobalModel>("global")
+        this.collectionTranslation = Database.db.collection<TranslationModel>("translation")
+        var t = await this.collectionGlobal.findOne({})
+        if (!t) throw new Error("No global config in database");
+        this.globals = t;
     }
 
-    static save():void {
-        let path:string = App.workspace + "index.json"
-        let j:any = fs.readFileSync(path).toString()
-        let index = JSON.parse(j);
-        let dbnames = index.files;
-        for (const dbobj of dbnames) {
-            if (!dbobj.save) continue
-            var dbname = dbobj.name
-            let path:string = App.workspace + dbname + ".json"
-            console.log(`Saving ${path} ...`);
-            let container:any = Database.db
-            for (var ps of dbname.split("/")){
-                container = container[ps];
-                if (container == undefined) console.log("Something went wrong while saving.");               
-            }
-            let j:string = JSON.stringify(container)
-            fs.writeFileSync(path,j);
-        }
+    public static async getServerDoc(id:string): Promise<ServerModel> {
+        var res: ServerModel|null = await this.collectionServer.findOne({id})
+        if (VERBOSE_DATABASE_LOGS) console.log(`Database retrieved value for server doc ${id}`);
+        if (VERBOSE_DATABASE_LOGS) console.log(res);
+        if (!res) res = await Database.createServer(id)
+        return res
     }
 
-    private static autosaveHandle:any = null;
-    static startAutosave():void {
-        this.autosaveHandle = setInterval(this.save,60000)
+    public static async getUserDoc(id:string): Promise<UserModel> {
+        var res: UserModel|null = await this.collectionUser.findOne({id})
+        if (VERBOSE_DATABASE_LOGS) console.log(`Database retrieved value for user doc ${id}`);
+        if (VERBOSE_DATABASE_LOGS) console.log(res);
+        if (!res) res = await Database.createUser(id);
+        return res
     }
-    static stopAutosave():void {
-        clearInterval(this.autosaveHandle)
+
+    public static async getUserDocForServer(id:string,gid:string): Promise<UserModelForServer> {
+        var res = (await this.getUserDoc(id)).servers[gid]
+        if (!res) res = await Database.createUserForServer(id,gid)
+        return res
+        
+    }
+
+    public static async getExistingUserDocForServer(id:string,gid:string): Promise<UserModelForServer | undefined> {
+        var res = (await this.getUserDoc(id)).servers[gid]
+        if (!res) return undefined
+        return res
+    }
+
+    public static async getExistingUserDoc(id:string): Promise<UserModel | undefined> {
+        var res = (await this.getUserDoc(id))
+        if (!res) return undefined
+        return res
+    }
+
+
+    public static async getTranslation(id: string): Promise<TranslationModel | undefined> {
+        var name = (await this.getUserDoc(id)).language
+        var res = await this.getTranslationByName(name)
+        return res
+    }
+
+
+    public static async getTranslationByName(id:string):Promise<TranslationModel | undefined> {
+        var res: TranslationModel | null = await this.collectionTranslation.findOne({lang: id})
+        if (!res) return undefined
+        return res
+    }
+    
+    public static async updateServerDoc(value: ServerModel) {
+        if (VERBOSE_DATABASE_LOGS) console.log(`Updating server doc for ${value.id} with`);
+        if (VERBOSE_DATABASE_LOGS) console.log(value);
+        await Database.collectionServer.replaceOne({id: value.id}, value)
+    }
+
+    public static async updateUserDoc(value: UserModel) {
+        if (VERBOSE_DATABASE_LOGS) console.log(`Updating server doc for ${value.id} with`);
+        if (VERBOSE_DATABASE_LOGS) console.log(value);
+        await Database.collectionUser.replaceOne({id: value.id},value)
+    }
+
+    public static async updateUserDocForServer(value: UserModelForServer) {
+        var user = await Database.getUserDoc(value.id)
+        user.servers[value.gid] = value
+        if (VERBOSE_DATABASE_LOGS) console.log(`Replacing user doc on server for ${value.id} on ${value.gid} with`);
+        if (VERBOSE_DATABASE_LOGS) console.log({replacement: value});
+        
+        await Database.updateUserDoc(user)
+    }
+
+    public static async createServer(id:string):Promise<ServerModel> {
+        if (VERBOSE_DATABASE_LOGS) console.log(`Created new server for ${id}`);
+        var j:ServerModel = JSON.parse((await readFile("./defaults/default_server.json")).toString())
+        j.id = id;
+        await Database.collectionServer.insertOne(j)
+        return j
+    }
+    
+    public static async createUser(id:string):Promise<UserModel> {
+        if (VERBOSE_DATABASE_LOGS) console.log(`Created new user for ${id}`);
+        var j:UserModel = JSON.parse((await readFile("./defaults/default_user.json")).toString())
+        j.id = id;
+        await Database.collectionUser.insertOne(j)
+        return j
+    }
+
+    public static async createUserForServer(id:string,gid:string):Promise<UserModelForServer> {
+        if (VERBOSE_DATABASE_LOGS) console.log(`Creating new user doc on server for ${id} on ${gid}`);
+        var j:UserModelForServer = JSON.parse((await readFile("./defaults/default_user_for_server.json")).toString())
+        j.id = id;
+        j.gid = gid;
+        var user = await this.getUserDoc(id);
+        user.servers[gid] = j
+        this.updateUserDocForServer(j)
+        return j
     }
 }

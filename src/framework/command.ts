@@ -1,8 +1,8 @@
 import { EType, Helper } from "./helper";
-import { Message, Channel, GuildMember, User, TextChannel, Client, Guild, ColorResolvable } from "discord.js";
 import { IModule } from "./module";
 import { App } from "./core";
 import { GenericContext } from "./context";
+import { Message } from "discord.js";
 
 export interface IArgument {
     type:EType,
@@ -18,17 +18,28 @@ export interface ICommand {
     subcommmands:Array<ICommand>,
     requiredPermission:string|null,
 
-    handle: (context: CommandContext) => void,
+    handle: (context: CommandContext) => any,
     
 
 
 }
 
 export class CommandContext extends GenericContext{
-    public args:Array<any>;
-
+    public args:Array<any> = [];
+    public args_pre: Array<any> | undefined;
+    private command
+    private args_raw
+    
     constructor (event:Message,module:IModule, callstack:Array<ICommand>, command:ICommand, args:Array<string>) {
         super(event);
-        this.args = Helper.parseArguments(args.join(" "),command.argtypes,this);
+        this.command = command
+        this.args_raw = args
+    }
+    
+    public async init2(): Promise<boolean> {
+        this.args_pre = await Helper.parseArguments(this.args_raw.join(" "),this.command.argtypes,this);
+        if (!this.args_pre) return false
+        this.args = this.args_pre
+        return true
     }
 }

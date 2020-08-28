@@ -4,7 +4,7 @@ import { ModuleTest } from "./testmodule";
 import { ModuleMusic } from "./music";
 import { ModuleTutorial } from "./tutorialmodule"
 //import { ModuleCrypto } from "./crypto";
-import { ModuleVoiceAssistant } from './voice-assistant';
+//import { ModuleVoiceAssistant } from './voice-assistant';
 import { ModuleModerator } from "./moderator";
 
 export function registerModules():void {
@@ -15,7 +15,7 @@ export function registerModules():void {
         */
         ModuleTest, 
         ModuleMusic,
-        ModuleVoiceAssistant,
+        //ModuleVoiceAssistant,
         ModuleTutorial,
         ModuleModerator
     )

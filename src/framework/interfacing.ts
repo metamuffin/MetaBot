@@ -1,8 +1,9 @@
 import { VoidCallback } from "./types";
 import { CommandContext } from "./command";
-import { Message, ColorResolvable, MessageReaction, User, Client } from "discord.js";
 import { IdentifiedClass } from "./helper";
 import { App } from "./core";
+import { ColorResolvable, Message, MessageReaction, User } from "discord.js";
+
 
 
 export interface SelectUIOption {
@@ -47,18 +48,17 @@ export class SelectUI extends GenericUI {
         this.config = config 
     }
 
-    public send():void {
+    public async send():Promise<void> {
         var messageContent:string = ""
         for (let optionCounter = 0; optionCounter < this.options.length; optionCounter++) {
             const option = this.options[optionCounter];
             messageContent += `\n${optionCounter+1}. :${option.icon}: ${option.text}`        
         }
         
-        this.context.channel.send({embed:{
+        var message = await this.context.channel.send({embed:{
             color: this.config.color,
             title: this.prompt,
             description: messageContent,
-            //timestamp: new Date(),
             footer: {
                 text: ``
             }

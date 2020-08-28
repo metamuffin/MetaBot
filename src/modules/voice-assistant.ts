@@ -1,8 +1,9 @@
 import { IModule } from "../framework/module";
-import { VoiceChannel, VoiceConnection, TextChannel, User, AudioPlayer, VoiceReceiver } from "discord.js";
 import { ICommand } from '../framework/command';
 import { EType, IdentifiedClass } from '../framework/helper';
 import { App } from "../framework/core";
+import { VoiceChannel, VoiceConnection } from "../api/channel";
+import { TextChannel } from "discord.js" 
 
 interface PlaylistElement {
     display: string,
@@ -41,13 +42,13 @@ export class VoiceAssistantPlayer extends IdentifiedClass {
         
         
         
-        this.vchannel.members.forEach((user) => { 
+        this.vchannel.members.forEach(async (user) => { 
             console.log(user.displayName);
             
-            var receiver = this.connection?.createReceiver()
+            var receiver = await this.connection?.createReceiver()
             console.log();
             
-            receiver?.on("opus",(u,buff) => {
+            receiver?.on("opus",(u:any,buff:any) => {
                 console.log(u);
                 console.log(buff);
                 
@@ -90,10 +91,10 @@ var CommandVoiceAssistantStart:ICommand = {
     subcommmands: [],
     useSubcommands:false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getVoiceAssistantPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getVoiceAssistantPlayer(c.message.author.voiceChannel)
             if (!player) {
-                player = new VoiceAssistantPlayer(c.message.member.voiceChannel,c.channel)
+                player = new VoiceAssistantPlayer(c.message.author.voiceChannel,c.channel)
                 c.log(c.translation.voice_assistant.startva.ok,"")
             }
             player?.start()
@@ -113,8 +114,8 @@ var CommandVoiceAssistantStop:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getVoiceAssistantPlayer(c.message.member.voiceChannel)
+        if (c.message.author.voiceChannel) {
+            var player = getVoiceAssistantPlayer(c.message.author.voiceChannel)
             if (!player) {
                 c.err(c.translation.error,c.translation.voice_assistant.no_player_found)
                 return
@@ -135,7 +136,7 @@ export var ModuleVoiceAssistant:IModule = {
         CommandVoiceAssistantStop
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

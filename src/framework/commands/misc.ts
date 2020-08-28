@@ -3,8 +3,6 @@ import { IModule } from "../module"
 import { EType, Helper } from "../helper"
 import { App } from "../core"
 import { Database } from "../database"
-import { exec } from "child_process"
-import * as ts from "typescript"
 
 
 
@@ -20,11 +18,11 @@ var CommandMiscAbout:ICommand = {
     handle: (c) => {
         var out = "";
         out += "This Bot is powered by MetaBot by MetaMuffin.\n"
-        out += "MetaBot is a open-source (GNU GPL v3) framework that makes creating bots easier by handling stuff like permissions, modules, data-storage and more.\n"
-        out += "See the source, issue-tracker, feauture-suggestions and documentaion on https://www.github.com/MetaMuffin/MetaBot"
+        out += "MetaBot is a open-source framework that makes creating bots easier by handling stuff like permissions, modules, data-storage and more.\n"
+        out += "MetaBot is licenced under the GNU General Public Licence Version 3, so feel free to contribute or modify this project.\n"
+        out += "See the source, issue-tracker, feauture-suggestions and documentation on https://www.github.com/MetaMuffin/MetaBot !"
         c.log("About",out)
     }
-    
 }
 
 
@@ -41,18 +39,21 @@ var CommandMiscHelp:ICommand = {
         }
     ],
     requiredPermission: null,
-    handle: (c) => {
+    handle: async (c) => {
         if (c.args[0] == ""){
             var outstr = ""
             for (const mod of App.modules) {
-                if (!Database.get().servers[c.guild.id].modules.includes(mod.name)){
+                if (!((await c.getServerDoc()).enabledModules.includes(mod.name))){
                     outstr += `~~${mod.name}~~: Not Enabled\n`
                     continue
                 }
                 outstr += `**__${mod.name}__**\n`
                 for (const command of mod.commands) {
                     try{
-                        outstr += `\u251c\u2500 **${command.name}:** ${c.translation[mod.name][command.name].description || "No Description Specified."}\n`
+                        var unsafe_translation: any = c.translation
+                        var desc: string = "*No description*"
+                        if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description || "No Description Specified."
+                        outstr += `\u251c\u2500 **${command.name}:** ${desc}\n`
                     } catch (e) {
                         c.err("There may be something missing in the help because of a missing translation :(",`Error on \`${mod.name}.${command.name}\``)
                         console.log(`[ERROR] ${command.name}`);
@@ -100,18 +101,6 @@ var CommandMiscHelp:ICommand = {
     }
 }
 
-var CommandMiscSave:ICommand = {
-    name: "save",
-    alias: [],
-    argtypes: [],
-    requiredPermission: "misc.save",
-    subcommmands: [],
-    useSubcommands: false,
-    handle: (c) => {
-        Database.save()
-        c.log("","Database is saved.")
-    }
-}
 
 var CommandMiscEval:ICommand = {
     name: "eval",
@@ -143,11 +132,10 @@ export var ModuleMisc:IModule = {
     commands: [
         CommandMiscAbout,
         CommandMiscHelp,
-        CommandMiscSave,
         CommandMiscEval
     ],
     handlers: [],
-    init: () => {
+    init: async () => {
         
     }
 }

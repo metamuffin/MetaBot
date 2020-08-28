@@ -1,5 +1,3 @@
-import { Discord, On, Client, IAppConfig } from "@typeit/discord";
-import { Message, ReactionEmoji, MessageReaction, User } from "discord.js"
 import { Database } from "./database";
 import { IModule } from "./module";
 import { Helper } from "./helper";
@@ -7,47 +5,43 @@ import { ICommand, CommandContext} from './command';
 import { loadNativeCommands } from "./commands/loader";
 import { HandlerContext } from "./handler";
 import { InterfaceHandler } from "./interfacing";
+import { Client, MessageReaction, User, Message, PartialUser } from "discord.js";
 
 
-@Discord
 export class App {
     public static client: Client;
     public static prefix: string = "}";
     public static workspace: string;
     public static modules: Array<IModule> = [];
 
+    
     setWorkspace(path:string):void {
         App.workspace = path;
     }
 
-    prepare():void {
-        App.client = new Client();
-
-        Database.load()
-        Database.startAutosave()
-
+    async init() {
+        await Database.init()
+        App.client = new Client({});
+        App.client.login(Database.globals.secret)
+        App.client.on("message",App.messageHandler)
+        App.client.on("messageReactionAdd",App.reactionHandler)
         loadNativeCommands()
-    }
-    
-    start():void {
-        App.client.login(
-            Database.get().bot.token,
-            `${__dirname}/*Discord.ts`
-        );
-        Database.get().bot.token = "THIS WAS DELETED.... HAHAHAHAA"
-        for (const mod of App.modules) {
-            setTimeout(mod.init,0)
+        for (const m of App.modules) {
+            console.log(`Initializing module ${m.name}...`);
+            await m.init()
         }
     }
 
-    @On("messageReactionAdd")
-    public static reactionHandler(reaction:MessageReaction, user:User):void {
-        InterfaceHandler.onReaction(reaction,user)
+    public static reactionHandler(reaction:MessageReaction, user:User | PartialUser):void {
+        // TODO
+        var u: any = user
+        InterfaceHandler.onReaction(reaction,u)
     }
 
-    @On("message")
-    public static messageHandler(message: Message):void {
-        if (message.author.id == App.client.user.id) return
+    public static async messageHandler(message: Message):Promise<void> {
+        if (message.author.id == App.client.user?.id) return
+        console.log(message.content);
+        
         
         if (InterfaceHandler.onMessage(message)) return        
 
@@ -58,7 +52,8 @@ export class App {
         }
         
         let foundCommand:boolean = false;
-        var activeModules:Array<string> = Helper.getServerData(message.guild.id).modules;
+        if (!message.guild) return console.log("Uff todo todo todo: line 48:core.ts");
+        var activeModules:Array<string> = (await Database.getServerDoc(message.guild.id)).enabledModules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
             if (isCommand){
@@ -69,7 +64,13 @@ export class App {
                         foundCommand = true;
 
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
-                        if (Helper.ensurePermission(context,h.requiredPermission)){
+                        if (!await context.init()) return
+                        if (!context.args_pre) {
+                            context.err("Too few or many arguments!","")
+                        }
+
+                        var permok = await Helper.ensurePermission(context,h.requiredPermission)
+                        if (permok){
                             console.log("Handling this Command.");
                             res.command.handle(context)
                         } else {
@@ -81,6 +82,7 @@ export class App {
             for (const handler of m.handlers) {
                 if (message.content && handler.regex.test(message.content)){
                     var context = new HandlerContext(message,handler)
+                    if (!await context.init()) return
                     if (Helper.ensurePermission(context,handler.enablePermission,handler.doPermissionError) && (!Helper.ensurePermission(context,handler.disablePermission,false))) {
                         handler.handle(context)
                     }

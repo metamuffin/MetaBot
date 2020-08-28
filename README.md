@@ -4,10 +4,6 @@ MetaBot is a High-Level framework built on top of discord.js for creating Discor
 It is written in TypeScript, so it can be used with Javascript too.
 *This Framework is not Finished yet so it could be instable*
 
-## Notice
-
-This version of MetaBot for Nodejs is discontinued. I am currently working on the branch mongodb-and-deno-support and writing metabots's own discord api wrapper to work for Deno.
-
 ## Features
 
 - Command/Handler structure with modules
@@ -16,18 +12,27 @@ This version of MetaBot for Nodejs is discontinued. I am currently working on th
 - Permission management
 - Argument parsing with multiple data-types
 
-## Installation
+## Getting started
 
-Download the repo and add your code to the source.
-In a future version a public npm-package will be created
+### Requirements
+- node 10.x
+- git
+- A local mongodb server
+- A discord application with a bot
+- Internet access
 
-## Commands
+*These instructions (and parts of the bot itself) only work Unix-like operating systemes. If you dont have one, you have to figure it out on your own. Good Luck*
 
-Run `npm run build` to build.
+1. Clone this repository
+    - `git clone https://www.github.com/MetaMuffin/MetaBot.git`
+2. Setup the database with global configurations
+    - Create a file `~/.metabotid` and store your client id of the bot in it. (make sure to not add a linebreak at the end)
+    - Create a file `~/.metabotsecret` and store your client secret in it.
+    - Run `cleandb.sh` from this repo. It will reset your mongo database and store the configuration in the global collection
+3. Build and Run the bot
+    - `npm run build`
+    - `npm run start`
 
-Run `npm run start` to start the bot in a production mode.
-
-Run `npm run start:dev` to use nodemon for debugging and live-reload.
 
 ## Documentation
 

@@ -1,9 +1,6 @@
-import { Message, User, AudioPlayer, Guild } from 'discord.js';
 import { Database } from "./database";
 import { CommandContext, IArgument } from "./command";
-import { userInfo } from "os";
 import { GenericContext } from './context';
-
 
 export enum EType {
     String,
@@ -11,7 +8,8 @@ export enum EType {
     Float,
     Command,
     MemberData,
-    Boolean
+    MemberDataForServer,
+    Boolean,
 }
 
 export class IdentifiedClass {
@@ -28,10 +26,10 @@ export class Helper {
         return msg.substr(1,msg.length).split(" ")
     }
 
-    public static ensurePermission(context:GenericContext, permstring: string|null, doError:boolean=true):boolean{
+    public static async ensurePermission(context:GenericContext, permstring: string|null, doError:boolean=true):Promise<boolean> {
         if (permstring == null) return true;
         
-        let userperms:Array<string> = this.getUserAccount(context.guild,context.author).permissions
+        let userperms:Array<string> = (await context.getAuthorDocForServer()).permissions
         userperms.map((e)=>{e.toLowerCase()})
         permstring = permstring.toLowerCase()
 
@@ -45,6 +43,7 @@ export class Helper {
                 permok = true;
             }
         }
+        
         if (userperms.includes("*")) permok = true;
         if ((!permok) && doError){
             context.err(context.translation.core.permission.no_permission.title,context.translation.core.permission.no_permission.description.replace("{perm}",permstring))
@@ -52,14 +51,14 @@ export class Helper {
         return permok;
     }
 
-    public static parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Array<any> {
+    public static async parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Promise<Array<any> | undefined> {
         types = types.slice(0)
         var c_arg = types.shift() || {type:EType.String,optional:true,name:"unnamed"}
         var in_quotes = false;
         var current_buffer:string = ""
         var args:Array<any> = [];
 
-        if (msg.search(" ") % 2 == 1) {
+        if (msg.search("\"") % 2 == 1) {
             context.err(context.translation.core.general.parse_error.title,"")
             return []
         }
@@ -71,13 +70,17 @@ export class Helper {
         
             if (c == " " && (!in_quotes)){
                 current_buffer = current_buffer.replace("\"","")
-                var parsed = this.parseArgument(current_buffer,c_arg.type,context)
+                var parsed = await this.parseArgument(current_buffer,c_arg.type,context)
+                if (parsed === undefined) {
+                    context.err(context.translation.core.general.parse_error.title,"Argument invalid.")
+                    return undefined
+                }
                 args.push(parsed)
                 var temp:IArgument|undefined = types.shift()
                 if (temp == undefined){
                     if (i == msg.length - 1) break
                     context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.not_enough_args)
-                    return args
+                    return undefined
                 }
                 c_arg = temp;
                 current_buffer = "";
@@ -94,22 +97,26 @@ export class Helper {
         return args
     }
 
-    public static parseArgument(buffer:string,type:EType,context:GenericContext):any|null {
+    public static async parseArgument(buffer:string,type:EType,context:GenericContext):Promise<any|null> {
         var r:any|null = ""
         if (type == EType.String) r = buffer.trim()
         if (type == EType.Float) {
             try {
+                if (buffer.trim() == "") throw new Error()
                 r = parseFloat(buffer.trim());
+                if (r === NaN) throw Error()
             } catch (e) {
-                context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.float_invalid);
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.float_invalid);
                 r = undefined
             }
         }
         if (type == EType.Integer) {
             try {
+                if (buffer.trim() == "") throw new Error()
                 r = parseInt(buffer.trim());
+                if (r == NaN) throw Error()
             } catch (e) {
-                context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.int_invalid);
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.int_invalid);
                 r = undefined
             }
         }
@@ -120,13 +127,27 @@ export class Helper {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
                 r = undefined
             } finally {
-
-                r = Helper.getExistingUserAccountById(context.guild,buffer.trim())
-                
-
+                console.log(buffer.trim());
+                r = await Database.getExistingUserDoc(buffer.trim())
                 if (!r) {
-                    context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
+                    return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
                 }
+                
+            }
+        }
+        if (type == EType.MemberDataForServer) {
+            try {
+                r = parseInt(buffer.trim())
+            } catch (e) {
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
+                r = undefined
+            } finally {
+                console.log(buffer.trim());
+                r = await Database.getExistingUserDoc(buffer.trim())
+                if (!r) {
+                    return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
+                }
+                r = await Database.getUserDocForServer(buffer.trim(),context.server.id)
             }
         }
         if (type == EType.Boolean) {
@@ -135,44 +156,6 @@ export class Helper {
         return r
     }
 
-    public static getUserTranslation(u:User):any{
-        return Database.get().lang[this.getGlobalUserAccount(u).language]
-    }
-
-    public static getGenericAccount(obj:any,indetifier:any):[any,boolean] {
-        var new_created:boolean = false;
-        if(!obj.hasOwnProperty(indetifier.toString())) {
-            obj[indetifier.toString()] = {...obj.default};
-            new_created = true
-        }
-        return [obj[indetifier.toString()], new_created];
-    }
-
-    public static getGlobalUserAccount(u:User):any{
-        var r = Helper.getGenericAccount(Database.get().members,u.id);
-        if (r[1]){
-            r[0].id = u.id
-            r[0].name = u.username
-        }
-        return r[0]
-    }
-    public static getUserAccount(guild:any, u:User){
-        var guild_data = this.getServerData(guild.id)
-        var [uac,n] = this.getGenericAccount(guild_data.members,u.id)
-        if (n){
-            uac.id = u.id
-            uac.name = u.username
-        }
-        return uac
-    }
-    public static getExistingUserAccountById(guild:Guild,uid:string): Object | undefined {
-        var guild_data = this.getServerData(guild.id)
-        return guild_data.members[uid]
-    }
-
-    public static getServerData(id:any):any {
-        return Helper.getGenericAccount(Database.get().servers,id)[0];
-    }
 
     public static deepGet(obj:any,path:Array<string>){
         var cur = obj

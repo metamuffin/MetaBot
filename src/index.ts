@@ -3,16 +3,16 @@ import { App } from "./framework/core";
 import { registerModules } from "./modules/moduleLoader";
 console.log("Imported. -> Logging in");
 
+async function main(){
+    var bot = new App()
+    
+    registerModules()
+    
+    
+    console.log("Starting Bot.");
+    await bot.init()
+    console.log("Running...");
 
+}
 
-var bot = new App()
-
-registerModules()
-
-
-bot.setWorkspace("../MetaBot-DB/")
-console.log("Preparing...");
-bot.prepare()
-console.log("Starting Bot.");
-
-bot.start()
+main()

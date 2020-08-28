@@ -6,5 +6,5 @@ export interface IModule {
     name:string,
     commands:Array<ICommand>,
     handlers:Array<IHandler>,
-    init: ()=>void
+    init: ()=>Promise<void>
 }

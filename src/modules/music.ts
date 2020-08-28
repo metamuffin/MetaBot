@@ -1,9 +1,10 @@
 import { IModule } from "../framework/module";
-import { VoiceChannel, VoiceConnection, TextChannel, User, StreamDispatcher } from "discord.js";
-import { ICommand } from '../framework/command';
+import { CommandContext, ICommand } from '../framework/command';
 import { EType, IdentifiedClass, Helper } from '../framework/helper';
-const ytdl = require("ytdl-core")
-
+import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
+import ytsr from "ytsr"
+import { userInfo } from "os";
+const ytdl:any = require("ytdl-core")
 
 interface PlaylistElement {
     display: string,
@@ -32,18 +33,16 @@ export class MusicPlayer extends IdentifiedClass {
         this.create()
     }
 
-    create(){
-        this.vchannel.join().then((con) => {
-            this.connection = con;
-        })
+    async create(){
+        this.connection = await this.vchannel.join();
     }
-    destroy(){
+    async destroy(){
         this.connection?.disconnect()
         var id = this.id
         setTimeout(function() { players.splice(players.findIndex((e) => { e.id == id })) },0)
     }
 
-    next(){
+    async next(){
         this.voters = []
         var next = this.playlist.shift()
         if (!next){
@@ -69,44 +68,34 @@ export class MusicPlayer extends IdentifiedClass {
         this.isPlaying = true;
         this.currentTitle = next
         if (!this.connection) this.tchannel.send("Internal Error: 234124325")
-        this.streamDispatcher = this.connection?.playStream(ytdl(next?.url))
-            .on("end",() => {
+        this.streamDispatcher = this.connection?.play(ytdl(next?.url))
+            .on("close",() => {
                 this.isPlaying = false;
                 this.currentTitle = undefined;
                 this.next()
-                
-            })        
-    }
-
-    add(search:string){
-        ytdl.getInfo(search,(err:any,info:any) => {
-            if (err) {
-                console.log(err)
-                this.tchannel.send({embed:{
-                    color:0xFF0000,
-                    title: "ERROOOOOOOOOOOOOOOR",
-                    description: "Uff..."
-                }})
-                return
-            };
-            if (this.isPlaying){
-                this.tchannel.send({embed:{
-                    color: 0x00FF00,
-                    title: info.player_response.videoDetails.title,
-                    description: "Playback scheduled."
-                }})
-            }
-            this.playlist.push({
-                display: info.player_response.videoDetails.title,
-                url: info.video_url
             })
-
-            
-            this.ensurePlaying()
-        })
     }
 
-    voteskip(user:User){
+    async add(search:string){
+        var info = await ytdl.getInfo(search)
+        if (this.isPlaying){
+            this.tchannel.send({embed:{
+                color: 0x00FF00,
+                title: info.player_response.videoDetails.title,
+                description: "Playback scheduled."
+            }})
+        }
+        this.playlist.push({
+            display: info.player_response.videoDetails.title,
+            url: info.video_url
+        })
+
+        
+        this.ensurePlaying()
+        
+    }
+
+    async voteskip(user:User){
         if (!this.isPlaying){
             this.tchannel.send({embed:{
                 color:0xFF0000,
@@ -124,12 +113,12 @@ export class MusicPlayer extends IdentifiedClass {
             return
         }
         this.voters.push(user.id)
-        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.size / 2)
+        var skipped = (this.voters.length) >= Math.ceil((this.vchannel.members.size - 1) / 2)
         
         this.tchannel.send({embed:{
             color:0xFFFF00,
             title: (skipped) ? "Skipped" : "",
-            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.size / 2)})`
+            description: `Voteskip (${this.voters.length} / ${Math.ceil((this.vchannel.members.size - 1) / 2)})`
         }})
         
         if (skipped){
@@ -138,8 +127,8 @@ export class MusicPlayer extends IdentifiedClass {
         
     }
 
-    ensurePlaying(){
-        if (!this.isPlaying) this.next()
+    async ensurePlaying(){
+        if (!this.isPlaying) await this.next()
     }
 }
 
@@ -152,6 +141,19 @@ var getMusicPlayer = (channel:VoiceChannel):MusicPlayer|undefined => {
     return undefined;
 }
 
+function getMusicPlayerForUser(c: CommandContext): MusicPlayer | undefined {
+    if (c.message.member?.voice.channel) {
+        var player = getMusicPlayer(c.message.member?.voice.channel)
+        if (!player) {
+            c.err(c.translation.error,c.translation.music.no_player_found)
+            return undefined
+        }
+        return player
+    } else {
+        c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
+    }
+    return undefined
+}
 
 var CommandMusicPlay:ICommand = {
     name: "play",
@@ -166,13 +168,27 @@ var CommandMusicPlay:ICommand = {
     requiredPermission: "music.play",
     subcommmands: [],
     useSubcommands:false,
-    handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
-            if (!player) {
-                player = new MusicPlayer(c.message.member.voiceChannel,c.channel,Helper.getGlobalUserAccount(c.author).language)
+    handle: async (c) => {
+        if (c.message?.member?.voice.channel) {
+            var url = ""
+            if (c.args[0].match(/https?:\/\/.+/i)) {
+                url = c.args[0]
+            } else {
+                var results = await ytsr(c.args[0],{limit:1})
+                console.log(results);
+                
+                for (const r of results.items) {
+                    if (r.type == "video") {
+                        url = r.link
+                    }
+                }
             }
-            player?.add(c.args[0])
+
+            var player = getMusicPlayer(c.message.member.voice.channel)
+            if (!player) {
+                player = new MusicPlayer(c.message.member.voice.channel,c.channel,await c.getAuthorLang())
+            }
+            player?.add(url)
 
         } else {
             c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
@@ -188,37 +204,29 @@ var CommandMusicSkip:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
-            if (!player) {
-                c.err(c.translation.error,c.translation.music.no_player_found)
-                return
-            }
-            player.voteskip(c.author)
-        } else {
-            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
-        }
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        player.voteskip(c.author)
     }
 }
 
 var CommandMusicVolume:ICommand = {
-    name: "skip",
-    alias: ["n"],
-    argtypes: [],
-    requiredPermission: "music.vote-skip",
+    name: "volume",
+    alias: ["vol"],
+    argtypes: [
+        {
+            name: "Volume",
+            optional: false,
+            type: EType.Float
+        }
+    ],
+    requiredPermission: "music.volume",
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
-            if (!player) {
-                c.err(c.translation.error,c.translation.music.no_player_found)
-                return
-            }
-            player.streamDispatcher?.setVolume(1)
-        } else {
-            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
-        }
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        player.streamDispatcher?.setVolume(c.args[0])
     }
 }
 
@@ -237,34 +245,46 @@ var CommandMusicLoop:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member.voiceChannel) {
-            var player = getMusicPlayer(c.message.member.voiceChannel)
-            if (!player) {
-                c.err(c.translation.error,c.translation.music.no_player_found)
-                return
-            }
-            player.loop = c.args[0]
-            if (player.isPlaying && player.currentTitle) player.playlist.push(player.currentTitle)
-            c.log("",(c.args[0]) ? c.translation.music.loop.state_updated_enable :  c.translation.music.loop.state_updated_disable)
-        } else {
-            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
-        }
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        player.loop = c.args[0]
+        if (player.isPlaying && player.currentTitle) player.playlist.push(player.currentTitle)
+        c.log("",(c.args[0]) ? c.translation.music.loop.state_updated_enable :  c.translation.music.loop.state_updated_disable)
     }
 }
 
-
+var CommandMusicQueue:ICommand = {
+    name: "queue",
+    alias: ["q"],
+    argtypes: [],
+    requiredPermission: "music.queue",
+    subcommmands: [],
+    useSubcommands: false,
+    handle: async (c) => {
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        var output = ""
+        for (const i of player.playlist) {
+            output += `[${i.display.replace(/[\[\]]/,"")}](${i.url})\n`
+        }
+        if (player.playlist.length == 0) output = "*nothing enqueued*"
+        c.log("Player Queue",output)
+    }
+}
 
 export var ModuleMusic:IModule = {
     name: "music",
     commands: [
         CommandMusicPlay,
         CommandMusicSkip,
-        CommandMusicLoop
+        CommandMusicLoop,
+        CommandMusicQueue,
+        CommandMusicVolume,
     ],
     handlers: [
         
     ],
-    init: () => {
+    init: async () => {
         
     }
 }
