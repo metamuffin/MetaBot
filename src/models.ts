@@ -7,6 +7,8 @@ export interface UserModel {
     language:string
 }
 export interface UserModelForServer {
+    id:string
+    gid:string
     warningTimestamp:number
     warnings:number
     permissions:Array<string>

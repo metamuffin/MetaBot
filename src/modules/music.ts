@@ -122,12 +122,12 @@ export class MusicPlayer extends IdentifiedClass {
             return
         }
         this.voters.push(user.id)
-        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.length / 2)
+        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.size / 2)
         
         this.tchannel.send({embed:{
             color:0xFFFF00,
             title: (skipped) ? "Skipped" : "",
-            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.length / 2)})`
+            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.size / 2)})`
         }})
         
         if (skipped){
@@ -165,10 +165,10 @@ var CommandMusicPlay:ICommand = {
     subcommmands: [],
     useSubcommands:false,
     handle: async (c) => {
-        if (c.message.author.voiceChannel) {
-            var player = getMusicPlayer(c.message.author.voiceChannel)
+        if (c.message?.member?.voice.channel) {
+            var player = getMusicPlayer(c.message.member.voice.channel)
             if (!player) {
-                player = new MusicPlayer(c.message.author.voiceChannel,c.channel,await c.getAuthorLang())
+                player = new MusicPlayer(c.message.member.voice.channel,c.channel,await c.getAuthorLang())
             }
             player?.add(c.args[0])
 
@@ -186,8 +186,8 @@ var CommandMusicSkip:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.author.voiceChannel) {
-            var player = getMusicPlayer(c.message.author.voiceChannel)
+        if (c.message?.member?.voice.channel) {
+            var player = getMusicPlayer(c.message.member.voice.channel)
             if (!player) {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return
@@ -207,8 +207,8 @@ var CommandMusicVolume:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.author.voiceChannel) {
-            var player = getMusicPlayer(c.message.author.voiceChannel)
+        if (c.message.member?.voice.channel) {
+            var player = getMusicPlayer(c.message.member?.voice.channel)
             if (!player) {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return
@@ -235,8 +235,8 @@ var CommandMusicLoop:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.author.voiceChannel) {
-            var player = getMusicPlayer(c.message.author.voiceChannel)
+        if (c.message.member?.voice.channel) {
+            var player = getMusicPlayer(c.message.member?.voice.channel)
             if (!player) {
                 c.err(c.translation.error,c.translation.music.no_player_found)
                 return

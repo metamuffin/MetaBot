@@ -1,7 +1,7 @@
 import { App } from "../framework/core";
 import { ModuleTest } from "./testmodule";
 //import { ModuleDND } from "./dnd";
-//import { ModuleMusic } from "./music";
+import { ModuleMusic } from "./music";
 import { ModuleTutorial } from "./tutorialmodule"
 //import { ModuleCrypto } from "./crypto";
 //import { ModuleVoiceAssistant } from './voice-assistant';
@@ -14,7 +14,7 @@ export function registerModules():void {
         ModuleCrypto,
         */
         ModuleTest, 
-        //ModuleMusic,
+        ModuleMusic,
         //ModuleVoiceAssistant,
         ModuleTutorial,
         ModuleModerator

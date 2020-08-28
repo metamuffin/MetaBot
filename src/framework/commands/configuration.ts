@@ -4,7 +4,6 @@ import { EType, Helper } from "../helper";
 import { App } from "../core";
 import { Database } from "../database";
 
-
 var CommandConfigModuleDisable:ICommand = {
     name: "disable",
     alias: ["d"],
@@ -21,9 +20,10 @@ var CommandConfigModuleDisable:ICommand = {
     handle: async (c) => {
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
-            var cfg = (await c.getServerDoc()).enabledModules
-            if (!cfg.includes(c.args[0].toLowerCase())) {
-                cfg.splice(cfg.findIndex(c.args[0].toLowerCase()))
+            var sc = (await c.getServerDoc())
+            if (!sc.enabledModules.includes(c.args[0].toLowerCase())) {
+                sc.enabledModules.splice(sc.enabledModules.findIndex(c.args[0].toLowerCase()))
+                await Database.updateServerDoc(sc)
                 c.log(c.translation.success_generic,c.translation.config.module.success_disabled)
             } else {
                 c.err(c.translation.error_generic,c.translation.config.module.error_already_disabled.replace("{0}",c.args[0][1]))
@@ -31,7 +31,6 @@ var CommandConfigModuleDisable:ICommand = {
         } else {
             c.err(c.translation.error_generic,c.translation.config.module.error_module_not_found.replace("{0}",c.args[0][1]))
         }
-        
     }
 }
 
@@ -49,12 +48,12 @@ var CommandConfigModuleEnable:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: async (c) => {
-        
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
-            var cfg = (await c.getServerDoc()).enabledModules
-            if (!cfg.includes(c.args[0].toLowerCase())) {
-                cfg.push(c.args[0].toLowerCase())
+            var sc = (await c.getServerDoc())
+            if (!sc.enabledModules.includes(c.args[0].toLowerCase())) {
+                sc.enabledModules.push(c.args[0].toLowerCase())
+                await Database.updateServerDoc(sc)
                 c.log(c.translation.success_generic,c.translation.config.module.success_enabled)
             } else {
                 c.err(c.translation.error_generic,c.translation.config.module.error_already_enabled.replace("{0}",c.args[0]))
@@ -87,6 +86,7 @@ var CommandConfigurationLanguage:ICommand = {
         }
         var ua = await c.getAuthorDoc()
         ua.language = lc.toLowerCase();
+        await c.updateAuthorDoc(ua)
         c.log("Settings changed successfully!","The next time you run any command, the language will be updated.");
         
     }

@@ -62,7 +62,9 @@ export class App {
 
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
                         await context.init()
-                        if (Helper.ensurePermission(context,h.requiredPermission)){
+                        var permok = context.message.member?.hasPermission("ADMINISTRATOR")
+                        if (!permok) permok = await Helper.ensurePermission(context,h.requiredPermission)
+                        if (permok){
                             console.log("Handling this Command.");
                             res.command.handle(context)
                         } else {

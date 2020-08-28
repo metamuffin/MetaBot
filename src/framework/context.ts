@@ -34,7 +34,9 @@ export class GenericContext {
         var t = await Database.getTranslation(this.message.author.id)
         if (!t) return this.log("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
         this.translation = t
+        await this.init2()
     }
+    public async init2(){}
 
     public async log(title:string,description:string):Promise<Message> {
         return await this.send(title,description,0xa70fff)
@@ -68,13 +70,13 @@ export class GenericContext {
         return (await this.getAuthorDoc()).language
     }
     public async updateAuthorDoc(doc: UserModel):Promise<void> {
-        await Database.updateUserDoc(this.author.id, doc)
+        await Database.updateUserDoc(doc)
     }
     public async updateAuthorDocForServer(doc: UserModelForServer): Promise<void> {
         await Database.updateUserDocForServer(this.author.id,this.server.id,doc);
     }
     public async updateServerDoc(doc: ServerModel): Promise<void> {
-        await Database.updateServerDoc(this.server.id, doc)
+        await Database.updateServerDoc(doc)
     }
 
 }

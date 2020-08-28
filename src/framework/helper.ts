@@ -8,7 +8,8 @@ export enum EType {
     Float,
     Command,
     MemberData,
-    Boolean
+    MemberDataForServer,
+    Boolean,
 }
 
 export class IdentifiedClass {
@@ -42,6 +43,7 @@ export class Helper {
                 permok = true;
             }
         }
+        
         if (userperms.includes("*")) permok = true;
         if ((!permok) && doError){
             context.err(context.translation.core.permission.no_permission.title,context.translation.core.permission.no_permission.description.replace("{perm}",permstring))
@@ -49,7 +51,7 @@ export class Helper {
         return permok;
     }
 
-    public static parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Array<any> {
+    public static async parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Promise<Array<any>> {
         types = types.slice(0)
         var c_arg = types.shift() || {type:EType.String,optional:true,name:"unnamed"}
         var in_quotes = false;
@@ -68,7 +70,7 @@ export class Helper {
         
             if (c == " " && (!in_quotes)){
                 current_buffer = current_buffer.replace("\"","")
-                var parsed = this.parseArgument(current_buffer,c_arg.type,context)
+                var parsed = await this.parseArgument(current_buffer,c_arg.type,context)
                 args.push(parsed)
                 var temp:IArgument|undefined = types.shift()
                 if (temp == undefined){
@@ -91,7 +93,7 @@ export class Helper {
         return args
     }
 
-    public static parseArgument(buffer:string,type:EType,context:GenericContext):any|null {
+    public static async parseArgument(buffer:string,type:EType,context:GenericContext):Promise<any|null> {
         var r:any|null = ""
         if (type == EType.String) r = buffer.trim()
         if (type == EType.Float) {
@@ -117,12 +119,27 @@ export class Helper {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
                 r = undefined
             } finally {
-
-                r = Database.getUserDocForServer(buffer.trim(),context.server.id)
-                
+                console.log(buffer.trim());
+                r = await Database.getExistingUserDoc(buffer.trim())
                 if (!r) {
-                    context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
+                    return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
                 }
+                
+            }
+        }
+        if (type == EType.MemberDataForServer) {
+            try {
+                r = parseInt(buffer.trim())
+            } catch (e) {
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
+                r = undefined
+            } finally {
+                console.log(buffer.trim());
+                r = await Database.getExistingUserDoc(buffer.trim())
+                if (!r) {
+                    return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
+                }
+                r = await Database.getUserDocForServer(buffer.trim(),context.server.id)
             }
         }
         if (type == EType.Boolean) {

@@ -56,4 +56,14 @@ export interface TranslationModel {
             blacklist_violation: string
         }
     }
+    music: {
+        no_player_found: string
+        play: {
+            not_in_a_voicechannel: string
+        }
+        loop: {
+            state_updated_enable: string
+            state_updated_disable: string
+        }
+    }
 }

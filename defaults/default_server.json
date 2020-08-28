@@ -1,5 +1,5 @@
 {
     "id": "",
-    "enabledModules": ["config","misc"],
+    "enabledModules": ["config","misc","permission"],
     "messageBlacklist": []
 }

@@ -1,6 +1,7 @@
 import { IModule } from '../module';
 import { ICommand } from '../command';
 import { EType, Helper } from '../helper';
+import { Database } from '../database';
 
 
 var CommandPermissionPermissionAdd:ICommand = {
@@ -11,7 +12,7 @@ var CommandPermissionPermissionAdd:ICommand = {
         {
             name: "member",
             optional: false,
-            type: EType.MemberData
+            type: EType.MemberDataForServer
         },
         {
             name: "permission-name",
@@ -21,25 +22,29 @@ var CommandPermissionPermissionAdd:ICommand = {
     ],
     useSubcommands: false,
     subcommmands: [],
-    handle: (c) => {
+    handle: async (c) => {
         if (!c.args[0]) return
         if (!c.args[1]) return
-        if (!Helper.ensurePermission(c,c.args[1],true)) return
-        if (c.args[0].permissions.includes(c.args[1])) return c.err("Permission already apllied.","")
+        //if (!Helper.ensurePermission(c,c.args[1],true)) return
+        if (c.args[0].permissions.includes(c.args[1])) return c.err("Permission already applied.","")
+        console.log({t1: c.args[0]});
         c.args[0].permissions.push(c.args[1])
-        c.log(c.translation.permission.permission.success,c.translation.permission.permission.add_success.replace("{0}",c.args[0].name).replace("{1}",c.args[1]));
+        console.log({t1: c.args[0]});
+        
+        await Database.updateUserDocForServer(c.args[0].id,c.args[0].gid,c.args[0])
+        c.log(c.translation.permission.permission.success,c.translation.permission.permission.add_success.replace("{0}",c.args[0].id).replace("{1}",c.args[1]));
     }
 }
 
 var CommandPermissionPermissionRemove:ICommand = {
     name: "remove",
     alias: ["r","d"],
-    requiredPermission: "core.permission.add",
+    requiredPermission: "core.permission.remove",
     argtypes: [
         {
             name: "member",
             optional: false,
-            type: EType.MemberData
+            type: EType.MemberDataForServer
         },
         {
             name: "permission-name",
@@ -62,12 +67,12 @@ var CommandPermissionPermissionRemove:ICommand = {
 var CommandPermissionPermissionList:ICommand = {
     name: "list",
     alias: ["l"],
-    requiredPermission: "core.permission.add",
+    requiredPermission: "core.permission.list",
     argtypes: [
         {
             name: "member",
             optional: false,
-            type: EType.MemberData
+            type: EType.MemberDataForServer
         }
     ],
     useSubcommands: false,

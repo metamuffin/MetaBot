@@ -7,3 +7,4 @@ fi
 id=$(cat ~/.metabotid)
 secret=$(cat ~/.metabotsecret)
 mongo 127.0.0.1/metabot --eval "db.getCollection('global').insertOne({id:'$id',secret:'$secret'})"
+ts-node translations/updateDB.ts
