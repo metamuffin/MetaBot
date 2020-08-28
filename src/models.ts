@@ -19,7 +19,6 @@ export interface ServerModel {
     id:string
     enabledModules:Array<string>
     messageBlacklist:Array<string>
-    modules:Array<string>
 }
 
 export interface GlobalModel {

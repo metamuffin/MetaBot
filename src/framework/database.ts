@@ -3,6 +3,10 @@ import { App } from './core';
 import { TranslationModel, UserModel, ServerModel, GlobalModel, UserModelForServer } from "../models";
 import {User} from "discord.js"
 import {MongoClient,Db,Collection} from "mongodb"
+import { create } from 'domain';
+import { Server } from 'http';
+import { readFile } from 'fs/promises';
+import { readFileSync } from 'fs';
 
 
 
@@ -31,19 +35,19 @@ export class Database {
 
     public static async getServerDoc(id:string): Promise<ServerModel> {
         var res: ServerModel|null = await this.collectionServer.findOne({id})
-        if (!res) throw new Error("Unimplemented");
+        if (!res) res = await Database.createServer(id)
         return res
     }
 
     public static async getUserDoc(id:string): Promise<UserModel> {
         var res: UserModel|null = await this.collectionUser.findOne({id})
-        if (!res) throw new Error("Unimplemented");
+        if (!res) res = await Database.createUser(id);
         return res
     }
 
     public static async getUserDocForServer(id:string,gid:string): Promise<UserModelForServer> {
         var res = (await this.getUserDoc(id)).servers[gid]
-        if (!res) throw new Error("Unimplemented");
+        if (!res) res = await Database.createUserForServer(id,gid)
         return res
         
     }
@@ -53,4 +57,40 @@ export class Database {
         return res
     }
     
+    public static async updateServerDoc(id:string, value: ServerModel) {
+        await Database.collectionServer.replaceOne({id},value)
+    }
+
+    public static async updateUserDoc(id:string, value: UserModel) {
+        await Database.collectionUser.replaceOne({id},value)
+    }
+
+    public static async updateUserDocForServer(id:string,gid:string, value: UserModelForServer) {
+        var user = await Database.getUserDoc(id)
+        user.servers[gid] = value
+        await Database.collectionUser.replaceOne({id},user)
+    }
+
+    public static async createServer(id:string):Promise<ServerModel> {
+        var j:ServerModel = JSON.parse((await readFile("../../defaults/default_server.json")).toString())
+        j.id = id;
+        await Database.collectionServer.insertOne(j)
+        return j
+    }
+    
+    public static async createUser(id:string):Promise<UserModel> {
+        var j:UserModel = JSON.parse((await readFile("../../defaults/default_user.json")).toString())
+        j.id = id;
+        await Database.collectionUser.insertOne(j)
+        return j
+    }
+
+
+    public static async createUserForServer(id:string,gid:string):Promise<UserModelForServer> {
+        var j:UserModelForServer = JSON.parse((await readFile("../../defaults/default_user_for_server.json")).toString())
+        var user = await this.getUserDoc(id);
+        user.servers[gid] = j
+        this.updateUserDocForServer(id,gid,j)
+        return j
+    }
 }
