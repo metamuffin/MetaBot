@@ -51,14 +51,14 @@ export class Helper {
         return permok;
     }
 
-    public static async parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Promise<Array<any>> {
+    public static async parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Promise<Array<any> | undefined> {
         types = types.slice(0)
         var c_arg = types.shift() || {type:EType.String,optional:true,name:"unnamed"}
         var in_quotes = false;
         var current_buffer:string = ""
         var args:Array<any> = [];
 
-        if (msg.search(" ") % 2 == 1) {
+        if (msg.search("\"") % 2 == 1) {
             context.err(context.translation.core.general.parse_error.title,"")
             return []
         }
@@ -76,7 +76,7 @@ export class Helper {
                 if (temp == undefined){
                     if (i == msg.length - 1) break
                     context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.not_enough_args)
-                    return args
+                    return undefined
                 }
                 c_arg = temp;
                 current_buffer = "";

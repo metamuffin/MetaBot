@@ -9,7 +9,6 @@ async function main(){
     registerModules()
     
     
-    bot.setWorkspace("../MetaBot-DB/")
     console.log("Starting Bot.");
     await bot.init()
     console.log("Running...");

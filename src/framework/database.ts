@@ -95,10 +95,10 @@ export class Database {
         await Database.collectionUser.replaceOne({id: value.id},value)
     }
 
-    public static async updateUserDocForServer(id:string,gid:string, value: UserModelForServer) {
-        var user = await Database.getUserDoc(id)
-        user.servers[gid] = value
-        console.log(`Replacing user doc on server for ${id} on ${gid} with`);
+    public static async updateUserDocForServer(value: UserModelForServer) {
+        var user = await Database.getUserDoc(value.id)
+        user.servers[value.gid] = value
+        console.log(`Replacing user doc on server for ${value.id} on ${value.gid} with`);
         console.log({replacement: value});
         
         await Database.updateUserDoc(user)
@@ -127,7 +127,7 @@ export class Database {
         j.gid = gid;
         var user = await this.getUserDoc(id);
         user.servers[gid] = j
-        this.updateUserDocForServer(id,gid,j)
+        this.updateUserDocForServer(j)
         return j
     }
 }

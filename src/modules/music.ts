@@ -2,8 +2,8 @@ import { IModule } from "../framework/module";
 import { ICommand } from '../framework/command';
 import { EType, IdentifiedClass, Helper } from '../framework/helper';
 import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
-const ytdl:any = null
-
+import ytsr from "ytsr"
+const ytdl:any = require("ytdl-core")
 
 interface PlaylistElement {
     display: string,
@@ -67,41 +67,31 @@ export class MusicPlayer extends IdentifiedClass {
         this.isPlaying = true;
         this.currentTitle = next
         if (!this.connection) this.tchannel.send("Internal Error: 234124325")
-        /*this.streamDispatcher = this.connection?.playStream(ytdl(next?.url))
-            .on("end",() => {
+        this.streamDispatcher = this.connection?.play(ytdl(next?.url))
+            .on("close",() => {
                 this.isPlaying = false;
                 this.currentTitle = undefined;
                 this.next()
-                
-            })*/
+            })
     }
 
     async add(search:string){
-        ytdl.getInfo(search,(err:any,info:any) => {
-            if (err) {
-                console.log(err)
-                this.tchannel.send({embed:{
-                    color:0xFF0000,
-                    title: "ERROOOOOOOOOOOOOOOR",
-                    description: "Uff..."
-                }})
-                return
-            };
-            if (this.isPlaying){
-                this.tchannel.send({embed:{
-                    color: 0x00FF00,
-                    title: info.player_response.videoDetails.title,
-                    description: "Playback scheduled."
-                }})
-            }
-            this.playlist.push({
-                display: info.player_response.videoDetails.title,
-                url: info.video_url
-            })
-
-            
-            this.ensurePlaying()
+        var info = await ytdl.getInfo(search)
+        if (this.isPlaying){
+            this.tchannel.send({embed:{
+                color: 0x00FF00,
+                title: info.player_response.videoDetails.title,
+                description: "Playback scheduled."
+            }})
+        }
+        this.playlist.push({
+            display: info.player_response.videoDetails.title,
+            url: info.video_url
         })
+
+        
+        this.ensurePlaying()
+        
     }
 
     async voteskip(user:User){
@@ -122,12 +112,12 @@ export class MusicPlayer extends IdentifiedClass {
             return
         }
         this.voters.push(user.id)
-        var skipped = (this.voters.length) >= Math.ceil(this.vchannel.members.size / 2)
+        var skipped = (this.voters.length) >= Math.ceil((this.vchannel.members.size - 1) / 2)
         
         this.tchannel.send({embed:{
             color:0xFFFF00,
             title: (skipped) ? "Skipped" : "",
-            description: `Voteskip (${this.voters.length} / ${Math.ceil(this.vchannel.members.size / 2)})`
+            description: `Voteskip (${this.voters.length} / ${Math.ceil((this.vchannel.members.size - 1) / 2)})`
         }})
         
         if (skipped){
@@ -166,11 +156,25 @@ var CommandMusicPlay:ICommand = {
     useSubcommands:false,
     handle: async (c) => {
         if (c.message?.member?.voice.channel) {
+            var url = ""
+            if (c.args[0].match(/https?:\/\/.+/i)) {
+                url = c.args[0]
+            } else {
+                var results = await ytsr(c.args[0],{limit:1})
+                console.log(results);
+                
+                for (const r of results.items) {
+                    if (r.type == "video") {
+                        url = r.link
+                    }
+                }
+            }
+
             var player = getMusicPlayer(c.message.member.voice.channel)
             if (!player) {
                 player = new MusicPlayer(c.message.member.voice.channel,c.channel,await c.getAuthorLang())
             }
-            player?.add(c.args[0])
+            player?.add(url)
 
         } else {
             c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)

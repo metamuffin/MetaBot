@@ -25,7 +25,8 @@ export interface ICommand {
 }
 
 export class CommandContext extends GenericContext{
-    public args:Array<any>;
+    public args:Array<any> = [];
+    public args_pre: Array<any> | undefined;
     private command
     private args_raw
     
@@ -33,11 +34,11 @@ export class CommandContext extends GenericContext{
         super(event);
         this.command = command
         this.args_raw = args
-        var __temp: any = undefined
-        this.args = __temp
     }
     
     public async init2() {
-        this.args = await Helper.parseArguments(this.args_raw.join(" "),this.command.argtypes,this);
+        this.args_pre = await Helper.parseArguments(this.args_raw.join(" "),this.command.argtypes,this);
+        if (!this.args_pre) return 
+        this.args = this.args_pre
     }
 }

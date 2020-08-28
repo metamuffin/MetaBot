@@ -73,7 +73,7 @@ export class GenericContext {
         await Database.updateUserDoc(doc)
     }
     public async updateAuthorDocForServer(doc: UserModelForServer): Promise<void> {
-        await Database.updateUserDocForServer(this.author.id,this.server.id,doc);
+        await Database.updateUserDocForServer(doc);
     }
     public async updateServerDoc(doc: ServerModel): Promise<void> {
         await Database.updateServerDoc(doc)

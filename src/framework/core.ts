@@ -26,7 +26,10 @@ export class App {
         App.client.on("message",App.messageHandler)
         App.client.on("messageReactionAdd",App.reactionHandler)
         loadNativeCommands()
-        await Promise.all(App.modules.map(m => m.init))
+        for (const m of App.modules) {
+            console.log(`Initializing module ${m.name}...`);
+            await m.init()
+        }
     }
 
     public static reactionHandler(reaction:MessageReaction, user:User | PartialUser):void {
@@ -62,8 +65,11 @@ export class App {
 
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
                         await context.init()
-                        var permok = context.message.member?.hasPermission("ADMINISTRATOR")
-                        if (!permok) permok = await Helper.ensurePermission(context,h.requiredPermission)
+                        if (!context.args_pre) {
+                            context.err("Too few or many arguments!","")
+                        }
+
+                        var permok = await Helper.ensurePermission(context,h.requiredPermission)
                         if (permok){
                             console.log("Handling this Command.");
                             res.command.handle(context)

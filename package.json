@@ -26,10 +26,14 @@
     "typescript": "^4.0.2"
   },
   "dependencies": {
+    "@discordjs/opus": "^0.3.2",
     "@typeit/discord": "^4.0.8",
     "@types/mongodb": "^3.5.26",
     "discord.js": "^12.3.1",
     "mongodb": "^3.6.0",
-    "tslib": "^2.0.1"
+    "opusscript": "0.0.7",
+    "tslib": "^2.0.1",
+    "ytdl-core": "^3.2.2",
+    "ytsr": "^0.1.21"
   }
 }
