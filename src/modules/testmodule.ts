@@ -1,7 +1,7 @@
-import { IModule } from "../framework/module.ts";
-import { ICommand } from "../framework/command.ts";
-import { Helper } from "../framework/helper.ts";
-import { SelectUI } from "../framework/interfacing.ts";
+import { IModule } from "../framework/module";
+import { ICommand } from "../framework/command";
+import { Helper } from "../framework/helper";
+import { SelectUI } from "../framework/interfacing";
 
 
 

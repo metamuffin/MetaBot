@@ -1,0 +1,29 @@
+{
+  "name": "metabot",
+  "version": "1.0.0",
+  "description": "MetaBot is a High-Level framework built on top of discord.js for creating Discord-Bots of any kind.\r It is written in TypeScript, so it can be used with Javascript too.\r *This Framework is not Finished yet so it could be instable*",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MetaMuffin/MetaBot.git"
+  },
+  "author": "MetaMuffin",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/MetaMuffin/MetaBot/issues"
+  },
+  "homepage": "https://github.com/MetaMuffin/MetaBot#readme",
+  "devDependencies": {
+    "@types/node": "^14.6.0",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
+  },
+  "dependencies": {
+    "@types/mongodb": "^3.5.26",
+    "discord.js": "^12.3.1",
+    "mongodb": "^3.6.0"
+  }
+}

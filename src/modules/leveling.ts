@@ -1,5 +1,5 @@
-import { IModule } from '../framework/module.ts';
-import { ICommand } from '../framework/command.ts';
+import { IModule } from '../framework/module';
+import { ICommand } from '../framework/command';
 
 
 

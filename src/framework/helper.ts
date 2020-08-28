@@ -1,6 +1,6 @@
-import { Database } from "./database.ts";
-import { CommandContext, IArgument } from "./command.ts";
-import { GenericContext } from './context.ts';
+import { Database } from "./database";
+import { CommandContext, IArgument } from "./command";
+import { GenericContext } from './context';
 
 export enum EType {
     String,

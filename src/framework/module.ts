@@ -1,5 +1,5 @@
-import { ICommand } from "./command.ts";
-import { IHandler } from "./handler.ts"
+import { ICommand } from "./command";
+import { IHandler } from "./handler"
 
 
 export interface IModule {

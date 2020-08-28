@@ -1,8 +1,8 @@
-import { IModule } from "../module.ts";
-import { ICommand, CommandContext } from "../command.ts";
-import { EType, Helper } from "../helper.ts";
-import { App } from "../core.ts";
-import { Database } from "../database.ts";
+import { IModule } from "../module";
+import { ICommand, CommandContext } from "../command";
+import { EType, Helper } from "../helper";
+import { App } from "../core";
+import { Database } from "../database";
 
 
 var CommandConfigModuleDisable:ICommand = {

@@ -1,11 +1,11 @@
-import { App } from "../framework/core.ts";
-import { ModuleTest } from "./testmodule.ts";
+import { App } from "../framework/core";
+import { ModuleTest } from "./testmodule";
 //import { ModuleDND } from "./dnd";
-import { ModuleMusic } from "./music.ts";
-import { ModuleTutorial } from "./tutorialmodule.ts"
+//import { ModuleMusic } from "./music";
+import { ModuleTutorial } from "./tutorialmodule"
 //import { ModuleCrypto } from "./crypto";
-import { ModuleVoiceAssistant } from './voice-assistant.ts';
-import { ModuleModerator } from "./moderator.ts";
+//import { ModuleVoiceAssistant } from './voice-assistant';
+import { ModuleModerator } from "./moderator";
 
 export function registerModules():void {
     App.modules.push(
@@ -14,8 +14,8 @@ export function registerModules():void {
         ModuleCrypto,
         */
         ModuleTest, 
-        ModuleMusic,
-        ModuleVoiceAssistant,
+        //ModuleMusic,
+        //ModuleVoiceAssistant,
         ModuleTutorial,
         ModuleModerator
     )

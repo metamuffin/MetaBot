@@ -1,11 +1,9 @@
-import { VoidCallback } from "./types.ts";
-import { CommandContext } from "./command.ts";
-import { IdentifiedClass } from "./helper.ts";
-import { App } from "./core.ts";
-import { MessageReaction } from "../api/reaction.ts";
-import { Message } from "../api/message.ts";
-import { User } from "../api/user.ts";
-import { ColorResolvable } from "../api/misc.ts";
+import { VoidCallback } from "./types";
+import { CommandContext } from "./command";
+import { IdentifiedClass } from "./helper";
+import { App } from "./core";
+import { ColorResolvable, Message, MessageReaction, User } from "discord.js";
+
 
 
 export interface SelectUIOption {

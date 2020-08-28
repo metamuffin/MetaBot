@@ -1,8 +1,8 @@
-import { MongoClient, Database as MongoDatabase, Collection } from "https://deno.land/x/mongo@v0.9.1/mod.ts";
-import { App } from './core.ts';
-import { TranslationModel, UserModel, ServerModel, GlobalModel, UserModelForServer } from "../models.ts";
-import { User } from "../api/user.ts";
 
+import { App } from './core';
+import { TranslationModel, UserModel, ServerModel, GlobalModel, UserModelForServer } from "../models";
+import {User} from "discord.js"
+import {MongoClient,Db,Collection} from "mongodb"
 
 
 
@@ -10,15 +10,16 @@ export class Database {
     
     public static globals: GlobalModel;
     public static dbclient: MongoClient
-    public static db:MongoDatabase
+    public static db: Db;
     public static collectionUser:Collection<UserModel>
     public static collectionServer:Collection<ServerModel>
     public static collectionGlobal:Collection<GlobalModel>
     public static collectionTranslation:Collection<TranslationModel>
 
     public static async init(){
-        this.dbclient = new MongoClient();
-        this.db = Database.dbclient.database("metabot");
+        this.dbclient = new MongoClient("mongodb://localhost:27017/metabot");
+        await this.dbclient.connect()
+        this.db = Database.dbclient.db("metabot")
         this.collectionUser= Database.db.collection<UserModel>("user")
         this.collectionServer = Database.db.collection<ServerModel>("server")
         this.collectionGlobal = Database.db.collection<GlobalModel>("global")
@@ -47,8 +48,9 @@ export class Database {
         
     }
 
-    public static async getTranslation(id:string):Promise<any> {
-
+    public static async getTranslation(id:string):Promise<TranslationModel | undefined> {
+        var res: TranslationModel = await this.collectionTranslation.findOne({id})
+        return res
     }
     
 }

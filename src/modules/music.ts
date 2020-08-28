@@ -1,8 +1,7 @@
-import { IModule } from "../framework/module.ts";
-import { ICommand } from '../framework/command.ts';
-import { EType, IdentifiedClass, Helper } from '../framework/helper.ts';
-import { VoiceChannel, TextChannel, StreamDispatcher, VoiceConnection } from "../api/channel.ts";
-import { User } from "../api/user.ts";
+import { IModule } from "../framework/module";
+import { ICommand } from '../framework/command';
+import { EType, IdentifiedClass, Helper } from '../framework/helper';
+import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
 const ytdl:any = null
 
 

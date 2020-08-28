@@ -1,8 +1,8 @@
-import { EType, Helper } from "./helper.ts";
-import { IModule } from "./module.ts";
-import { App } from "./core.ts";
-import { GenericContext } from "./context.ts";
-import { Message } from "../api/message.ts";
+import { EType, Helper } from "./helper";
+import { IModule } from "./module";
+import { App } from "./core";
+import { GenericContext } from "./context";
+import { Message } from "discord.js";
 
 export interface IArgument {
     type:EType,

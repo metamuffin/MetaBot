@@ -1,12 +1,9 @@
-import { IModule } from "./module.ts";
-import { Helper } from "./helper.ts";
-import { Message } from "../api/message.ts";
-import { TextChannel } from "../api/channel.ts";
-import { Guild } from "../api/guild.ts";
-import { User } from "../api/user.ts";
-import { ColorResolvable } from "../api/misc.ts";
-import { Database } from "./database.ts";
-import { ServerModel, UserModelForServer, UserModel } from "../models.ts";
+import { IModule } from "./module";
+import { Helper } from "./helper";
+import { Message, Guild, TextChannel, ColorResolvable, User } from "discord.js";
+
+import { Database } from "./database";
+import { ServerModel, UserModelForServer, UserModel } from "../models";
 
 
 

@@ -1,9 +1,9 @@
-import { IModule } from "../framework/module.ts";
-import { ICommand } from '../framework/command.ts';
-import { EType, IdentifiedClass } from '../framework/helper.ts';
-import { App } from "../framework/core.ts";
-import { VoiceChannel, VoiceConnection } from "../api/channel.ts";
-import { TextChannel } from "../api/channel.ts";
+import { IModule } from "../framework/module";
+import { ICommand } from '../framework/command';
+import { EType, IdentifiedClass } from '../framework/helper';
+import { App } from "../framework/core";
+import { VoiceChannel, VoiceConnection } from "../api/channel";
+import { TextChannel } from "discord.js" 
 
 interface PlaylistElement {
     display: string,

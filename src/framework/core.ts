@@ -1,14 +1,11 @@
-import { Database } from "./database.ts";
-import { IModule } from "./module.ts";
-import { Helper } from "./helper.ts";
-import { ICommand, CommandContext} from './command.ts';
-import { loadNativeCommands } from "./commands/loader.ts";
-import { HandlerContext } from "./handler.ts";
-import { InterfaceHandler } from "./interfacing.ts";
-import { Client } from "../api/client.ts";
-import { MessageReaction } from "../api/reaction.ts";
-import { User } from "../api/user.ts";
-import { Message } from "../api/message.ts";
+import { Database } from "./database";
+import { IModule } from "./module";
+import { Helper } from "./helper";
+import { ICommand, CommandContext} from './command';
+import { loadNativeCommands } from "./commands/loader";
+import { HandlerContext } from "./handler";
+import { InterfaceHandler } from "./interfacing";
+import { Client, MessageReaction, User, Message } from "discord.js";
 
 
 export class App {
@@ -24,7 +21,8 @@ export class App {
 
     async init() {
         await Database.init()
-        App.client = new Client(Database.globals.id,Database.globals.secret);
+        App.client = new Client({});
+        App.client.login(Database.globals.secret)
         loadNativeCommands()
         await Promise.all(App.modules.map(m => m.init))
     }

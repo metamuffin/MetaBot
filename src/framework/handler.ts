@@ -1,5 +1,5 @@
-import { GenericContext } from './context.ts';
-import { Message } from '../api/message.ts';
+import { Message } from 'discord.js';
+import { GenericContext } from './context';
 
 
 

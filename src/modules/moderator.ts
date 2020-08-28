@@ -1,8 +1,8 @@
-import { IModule } from '../framework/module.ts';
-import { IHandler } from '../framework/handler.ts';
-import { Database } from '../framework/database.ts';
-import { Helper } from '../framework/helper.ts';
-import { GenericContext } from '../framework/context.ts';
+import { IModule } from '../framework/module';
+import { IHandler } from '../framework/handler';
+import { Database } from '../framework/database';
+import { Helper } from '../framework/helper';
+import { GenericContext } from '../framework/context';
 
 
 export async function moderatorWarn(c:GenericContext, reason:string){

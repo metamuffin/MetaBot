@@ -1,8 +1,8 @@
-import { ICommand } from "../command.ts"
-import { IModule } from "../module.ts"
-import { EType, Helper } from "../helper.ts"
-import { App } from "../core.ts"
-import { Database } from "../database.ts"
+import { ICommand } from "../command"
+import { IModule } from "../module"
+import { EType, Helper } from "../helper"
+import { App } from "../core"
+import { Database } from "../database"
 
 
 

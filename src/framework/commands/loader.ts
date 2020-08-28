@@ -1,7 +1,7 @@
-import { App } from "../core.ts"
-import { ModuleMisc } from "./misc.ts"
-import { ModuleConfiguration } from "./configuration.ts"
-import { ModulePermission } from './permission.ts';
+import { App } from "../core"
+import { ModuleMisc } from "./misc"
+import { ModuleConfiguration } from "./configuration"
+import { ModulePermission } from './permission';
 
 
 
