@@ -1,8 +1,9 @@
 import { IModule } from "../framework/module";
-import { ICommand } from '../framework/command';
+import { CommandContext, ICommand } from '../framework/command';
 import { EType, IdentifiedClass, Helper } from '../framework/helper';
 import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
 import ytsr from "ytsr"
+import { userInfo } from "os";
 const ytdl:any = require("ytdl-core")
 
 interface PlaylistElement {
@@ -140,6 +141,19 @@ var getMusicPlayer = (channel:VoiceChannel):MusicPlayer|undefined => {
     return undefined;
 }
 
+function getMusicPlayerForUser(c: CommandContext): MusicPlayer | undefined {
+    if (c.message.member?.voice.channel) {
+        var player = getMusicPlayer(c.message.member?.voice.channel)
+        if (!player) {
+            c.err(c.translation.error,c.translation.music.no_player_found)
+            return undefined
+        }
+        return player
+    } else {
+        c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
+    }
+    return undefined
+}
 
 var CommandMusicPlay:ICommand = {
     name: "play",
@@ -190,37 +204,29 @@ var CommandMusicSkip:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message?.member?.voice.channel) {
-            var player = getMusicPlayer(c.message.member.voice.channel)
-            if (!player) {
-                c.err(c.translation.error,c.translation.music.no_player_found)
-                return
-            }
-            player.voteskip(c.author)
-        } else {
-            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
-        }
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        player.voteskip(c.author)
     }
 }
 
 var CommandMusicVolume:ICommand = {
-    name: "skip",
-    alias: ["n"],
-    argtypes: [],
-    requiredPermission: "music.vote-skip",
+    name: "volume",
+    alias: ["vol"],
+    argtypes: [
+        {
+            name: "Volume",
+            optional: false,
+            type: EType.Float
+        }
+    ],
+    requiredPermission: "music.volume",
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member?.voice.channel) {
-            var player = getMusicPlayer(c.message.member?.voice.channel)
-            if (!player) {
-                c.err(c.translation.error,c.translation.music.no_player_found)
-                return
-            }
-            player.streamDispatcher?.setVolume(1)
-        } else {
-            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
-        }
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        player.streamDispatcher?.setVolume(c.args[0])
     }
 }
 
@@ -239,29 +245,41 @@ var CommandMusicLoop:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.message.member?.voice.channel) {
-            var player = getMusicPlayer(c.message.member?.voice.channel)
-            if (!player) {
-                c.err(c.translation.error,c.translation.music.no_player_found)
-                return
-            }
-            player.loop = c.args[0]
-            if (player.isPlaying && player.currentTitle) player.playlist.push(player.currentTitle)
-            c.log("",(c.args[0]) ? c.translation.music.loop.state_updated_enable :  c.translation.music.loop.state_updated_disable)
-        } else {
-            c.err(c.translation.error,c.translation.music.play.not_in_a_voicechannel)
-        }
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        player.loop = c.args[0]
+        if (player.isPlaying && player.currentTitle) player.playlist.push(player.currentTitle)
+        c.log("",(c.args[0]) ? c.translation.music.loop.state_updated_enable :  c.translation.music.loop.state_updated_disable)
     }
 }
 
-
+var CommandMusicQueue:ICommand = {
+    name: "queue",
+    alias: ["q"],
+    argtypes: [],
+    requiredPermission: "music.queue",
+    subcommmands: [],
+    useSubcommands: false,
+    handle: async (c) => {
+        var player = getMusicPlayerForUser(c)
+        if (!player) return
+        var output = ""
+        for (const i of player.playlist) {
+            output += `[${i.display.replace(/[\[\]]/,"")}](${i.url})\n`
+        }
+        if (player.playlist.length == 0) output = "*nothing enqueued*"
+        c.log("Player Queue",output)
+    }
+}
 
 export var ModuleMusic:IModule = {
     name: "music",
     commands: [
         CommandMusicPlay,
         CommandMusicSkip,
-        CommandMusicLoop
+        CommandMusicLoop,
+        CommandMusicQueue,
+        CommandMusicVolume,
     ],
     handlers: [
         

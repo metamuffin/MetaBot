@@ -1,8 +1,10 @@
 import { IModule } from '../framework/module';
 import { IHandler } from '../framework/handler';
 import { Database } from '../framework/database';
-import { Helper } from '../framework/helper';
+import { EType, Helper } from '../framework/helper';
 import { GenericContext } from '../framework/context';
+import { ICommand } from '../framework/command';
+import { DiscordAPIError } from 'discord.js';
 
 
 export async function moderatorWarn(c:GenericContext, reason:string){
@@ -63,13 +65,49 @@ var HandlerModeratorLinks:IHandler = {
     }
 
 }
-
+var CommandModeratorRemoveLastMessages:ICommand = {
+    name: "removelastmessages",
+    alias: ["rmlast","removelast"],
+    requiredPermission: "moderator.remove_last_messages",
+    argtypes: [
+        {
+            name: "Count",
+            optional: false,
+            type: EType.Integer
+        },
+        {
+            name: "remove pinned",
+            optional: true,
+            type: EType.Boolean
+        }
+    ],
+    subcommmands: [],
+    useSubcommands: false,
+    handle: async (c) => {
+        if (c.args[0] > 100) return c.err(c.translation.error,"Too many messages to delete")
+        if (!c.args[1]) c.args[1] = false
+        var msgs = []
+        for (const [_,message] of await c.channel.messages.fetch({limit: c.args[0]})) {
+            if (message.pinned && (!c.args[1])) continue
+            msgs.push(message)
+        }
+        try {
+            await c.channel.bulkDelete(msgs)
+        } catch (DiscordAPIError) {
+            return c.err(c.translation.error,"I can only delete messages from the last 14 days because of the Discord API limitations. Sorry.")
+        }
+        setTimeout(async () => {
+            var logm = await c.log("",`Deleted the last ${c.args[0]} messages.`)
+            logm.delete({timeout: 5000})        
+        }, 1000)
+    }
+}
 
 
 export var ModuleModerator:IModule = {
     name: "moderator",
     commands: [
-
+        CommandModeratorRemoveLastMessages
     ],
     handlers: [
         HandlerModeratorBlacklist,

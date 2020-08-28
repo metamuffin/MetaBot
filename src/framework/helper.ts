@@ -71,6 +71,10 @@ export class Helper {
             if (c == " " && (!in_quotes)){
                 current_buffer = current_buffer.replace("\"","")
                 var parsed = await this.parseArgument(current_buffer,c_arg.type,context)
+                if (parsed === undefined) {
+                    context.err(context.translation.core.general.parse_error.title,"Argument invalid.")
+                    return undefined
+                }
                 args.push(parsed)
                 var temp:IArgument|undefined = types.shift()
                 if (temp == undefined){
@@ -98,7 +102,9 @@ export class Helper {
         if (type == EType.String) r = buffer.trim()
         if (type == EType.Float) {
             try {
+                if (buffer.trim() == "") throw new Error()
                 r = parseFloat(buffer.trim());
+                if (r === NaN) throw Error()
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.float_invalid);
                 r = undefined
@@ -106,7 +112,9 @@ export class Helper {
         }
         if (type == EType.Integer) {
             try {
+                if (buffer.trim() == "") throw new Error()
                 r = parseInt(buffer.trim());
+                if (r == NaN) throw Error()
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.int_invalid);
                 r = undefined

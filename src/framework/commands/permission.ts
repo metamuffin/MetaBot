@@ -144,8 +144,6 @@ export var ModulePermission:IModule = {
     handlers: [],
     init: async () => {
         updateToken()
-        console.log("test2174128739072");
-        
     }
 }
 

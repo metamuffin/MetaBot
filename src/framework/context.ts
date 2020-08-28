@@ -30,13 +30,18 @@ export class GenericContext {
         this.translation = t
     }
     
-    public async init() {
+    public async init(): Promise<boolean> {
         var t = await Database.getTranslation(this.message.author.id)
-        if (!t) return this.log("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
+        if (!t) {
+            this.log("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
+            return false
+        }
         this.translation = t
-        await this.init2()
+        return await this.init2()
     }
-    public async init2(){}
+    public async init2(): Promise<boolean> {
+        return true
+    }
 
     public async log(title:string,description:string):Promise<Message> {
         return await this.send(title,description,0xa70fff)

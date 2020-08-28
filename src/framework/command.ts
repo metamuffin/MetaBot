@@ -36,9 +36,10 @@ export class CommandContext extends GenericContext{
         this.args_raw = args
     }
     
-    public async init2() {
+    public async init2(): Promise<boolean> {
         this.args_pre = await Helper.parseArguments(this.args_raw.join(" "),this.command.argtypes,this);
-        if (!this.args_pre) return 
+        if (!this.args_pre) return false
         this.args = this.args_pre
+        return true
     }
 }

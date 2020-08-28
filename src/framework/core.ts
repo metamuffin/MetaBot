@@ -64,7 +64,7 @@ export class App {
                         foundCommand = true;
 
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
-                        await context.init()
+                        if (!await context.init()) return
                         if (!context.args_pre) {
                             context.err("Too few or many arguments!","")
                         }
@@ -82,7 +82,7 @@ export class App {
             for (const handler of m.handlers) {
                 if (message.content && handler.regex.test(message.content)){
                     var context = new HandlerContext(message,handler)
-                    await context.init()
+                    if (!await context.init()) return
                     if (Helper.ensurePermission(context,handler.enablePermission,handler.doPermissionError) && (!Helper.ensurePermission(context,handler.disablePermission,false))) {
                         handler.handle(context)
                     }
