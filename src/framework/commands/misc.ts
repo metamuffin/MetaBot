@@ -43,14 +43,17 @@ var CommandMiscHelp:ICommand = {
         if (c.args[0] == ""){
             var outstr = ""
             for (const mod of App.modules) {
-                if (!((await c.getServerDoc()).modules.includes(mod.name))){
+                if (!((await c.getServerDoc()).enabledModules.includes(mod.name))){
                     outstr += `~~${mod.name}~~: Not Enabled\n`
                     continue
                 }
                 outstr += `**__${mod.name}__**\n`
                 for (const command of mod.commands) {
                     try{
-                        outstr += `\u251c\u2500 **${command.name}:** ${c.translation[mod.name][command.name].description || "No Description Specified."}\n`
+                        var unsafe_translation: any = c.translation
+                        var desc: string = "*No description*"
+                        if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description || "No Description Specified."
+                        outstr += `\u251c\u2500 **${command.name}:** ${desc}\n`
                     } catch (e) {
                         c.err("There may be something missing in the help because of a missing translation :(",`Error on \`${mod.name}.${command.name}\``)
                         console.log(`[ERROR] ${command.name}`);

@@ -1,7 +1,6 @@
 {
-    "__comment": "Yes i use nodemon for deno.... :D",
     "watch": ["src"],
     "ext": ".ts,.js",
     "ignore": [],
-    "exec": "deno run src/index.ts"
+    "exec": "ts-node src/index.ts"
 }

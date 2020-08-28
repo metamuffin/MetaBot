@@ -4,6 +4,7 @@ import { Message, Guild, TextChannel, ColorResolvable, User } from "discord.js";
 
 import { Database } from "./database";
 import { ServerModel, UserModelForServer, UserModel } from "../models";
+import { TranslationModel } from "../translation";
 
 
 
@@ -11,19 +12,28 @@ export class GenericContext {
     public channel:TextChannel
     public author:User
     public message:Message
-    public translation:any
+    public translation:TranslationModel
     public server:Guild
 
     constructor (event:Message) {
         this.message = event
         this.author = event.author
+        // TODO
+        // @ts-ignore
         this.server = event.guild
         if (!(event.channel instanceof TextChannel)){
             throw new Error("Cannot use Commands in DM Channels")
             return
         }
         this.channel = (event.channel instanceof TextChannel) ? event.channel : (():any=>{return null})()
-        this.translation = Database.getTranslation(this.message.author.id)
+        var t:any = {} // TODO
+        this.translation = t
+    }
+    
+    public async init() {
+        var t = await Database.getTranslation(this.message.author.id)
+        if (!t) return this.log("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
+        this.translation = t
     }
 
     public async log(title:string,description:string):Promise<Message> {
@@ -57,4 +67,14 @@ export class GenericContext {
     public async getAuthorLang():Promise<string> {
         return (await this.getAuthorDoc()).language
     }
+    public async updateAuthorDoc(doc: UserModel):Promise<void> {
+        await Database.updateUserDoc(this.author.id, doc)
+    }
+    public async updateAuthorDocForServer(doc: UserModelForServer): Promise<void> {
+        await Database.updateUserDocForServer(this.author.id,this.server.id,doc);
+    }
+    public async updateServerDoc(doc: ServerModel): Promise<void> {
+        await Database.updateServerDoc(this.server.id, doc)
+    }
+
 }

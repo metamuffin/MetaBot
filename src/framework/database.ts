@@ -1,12 +1,13 @@
 
 import { App } from './core';
-import { TranslationModel, UserModel, ServerModel, GlobalModel, UserModelForServer } from "../models";
+import { UserModel, ServerModel, GlobalModel, UserModelForServer } from "../models";
 import {User} from "discord.js"
 import {MongoClient,Db,Collection} from "mongodb"
 import { create } from 'domain';
 import { Server } from 'http';
 import { readFile } from 'fs/promises';
 import { readFileSync } from 'fs';
+import { TranslationModel } from '../translation';
 
 
 
@@ -52,8 +53,19 @@ export class Database {
         
     }
 
-    public static async getTranslation(id:string):Promise<TranslationModel | undefined> {
-        var res: TranslationModel = await this.collectionTranslation.findOne({id})
+    public static async getTranslation(id: string): Promise<TranslationModel | undefined> {
+        var name = (await this.getUserDoc(id)).language
+        var res = await this.getTranslationByName(name)
+        return res
+    }
+
+
+    public static async getTranslationByName(id:string):Promise<TranslationModel | undefined> {
+        
+        var res: TranslationModel | null = await this.collectionTranslation.findOne({lang: id})
+        console.log(res);
+        
+        if (!res) return undefined
         return res
     }
     
@@ -72,14 +84,14 @@ export class Database {
     }
 
     public static async createServer(id:string):Promise<ServerModel> {
-        var j:ServerModel = JSON.parse((await readFile("../../defaults/default_server.json")).toString())
+        var j:ServerModel = JSON.parse((await readFile("./defaults/default_server.json")).toString())
         j.id = id;
         await Database.collectionServer.insertOne(j)
         return j
     }
     
     public static async createUser(id:string):Promise<UserModel> {
-        var j:UserModel = JSON.parse((await readFile("../../defaults/default_user.json")).toString())
+        var j:UserModel = JSON.parse((await readFile("./defaults/default_user.json")).toString())
         j.id = id;
         await Database.collectionUser.insertOne(j)
         return j
@@ -87,7 +99,7 @@ export class Database {
 
 
     public static async createUserForServer(id:string,gid:string):Promise<UserModelForServer> {
-        var j:UserModelForServer = JSON.parse((await readFile("../../defaults/default_user_for_server.json")).toString())
+        var j:UserModelForServer = JSON.parse((await readFile("./defaults/default_user_for_server.json")).toString())
         var user = await this.getUserDoc(id);
         user.servers[gid] = j
         this.updateUserDocForServer(id,gid,j)

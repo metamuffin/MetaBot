@@ -98,7 +98,7 @@ export class Helper {
             try {
                 r = parseFloat(buffer.trim());
             } catch (e) {
-                context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.float_invalid);
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.float_invalid);
                 r = undefined
             }
         }
@@ -106,7 +106,7 @@ export class Helper {
             try {
                 r = parseInt(buffer.trim());
             } catch (e) {
-                context.err(context.translation.core.general.parse_error.title,context.translation.core.gerneral.parse_error.int_invalid);
+                context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.int_invalid);
                 r = undefined
             }
         }

@@ -21,7 +21,7 @@ var CommandConfigModuleDisable:ICommand = {
     handle: async (c) => {
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
-            var cfg = (await c.getServerDoc()).modules
+            var cfg = (await c.getServerDoc()).enabledModules
             if (!cfg.includes(c.args[0].toLowerCase())) {
                 cfg.splice(cfg.findIndex(c.args[0].toLowerCase()))
                 c.log(c.translation.success_generic,c.translation.config.module.success_disabled)
@@ -52,7 +52,7 @@ var CommandConfigModuleEnable:ICommand = {
         
         var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
-            var cfg = (await c.getServerDoc()).modules
+            var cfg = (await c.getServerDoc()).enabledModules
             if (!cfg.includes(c.args[0].toLowerCase())) {
                 cfg.push(c.args[0].toLowerCase())
                 c.log(c.translation.success_generic,c.translation.config.module.success_enabled)

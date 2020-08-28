@@ -5,7 +5,7 @@ import { ICommand, CommandContext} from './command';
 import { loadNativeCommands } from "./commands/loader";
 import { HandlerContext } from "./handler";
 import { InterfaceHandler } from "./interfacing";
-import { Client, MessageReaction, User, Message } from "discord.js";
+import { Client, MessageReaction, User, Message, PartialUser } from "discord.js";
 
 
 export class App {
@@ -23,16 +23,22 @@ export class App {
         await Database.init()
         App.client = new Client({});
         App.client.login(Database.globals.secret)
+        App.client.on("message",App.messageHandler)
+        App.client.on("messageReactionAdd",App.reactionHandler)
         loadNativeCommands()
         await Promise.all(App.modules.map(m => m.init))
     }
-    
-    public static reactionHandler(reaction:MessageReaction, user:User):void {
-        InterfaceHandler.onReaction(reaction,user)
+
+    public static reactionHandler(reaction:MessageReaction, user:User | PartialUser):void {
+        // TODO
+        var u: any = user
+        InterfaceHandler.onReaction(reaction,u)
     }
 
     public static async messageHandler(message: Message):Promise<void> {
         if (message.author.id == App.client.user?.id) return
+        console.log(message.content);
+        
         
         if (InterfaceHandler.onMessage(message)) return        
 
@@ -43,6 +49,7 @@ export class App {
         }
         
         let foundCommand:boolean = false;
+        if (!message.guild) return console.log("Uff todo todo todo: line 48:core.ts");
         var activeModules:Array<string> = (await Database.getServerDoc(message.guild.id)).enabledModules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
@@ -54,6 +61,7 @@ export class App {
                         foundCommand = true;
 
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
+                        await context.init()
                         if (Helper.ensurePermission(context,h.requiredPermission)){
                             console.log("Handling this Command.");
                             res.command.handle(context)
@@ -66,6 +74,7 @@ export class App {
             for (const handler of m.handlers) {
                 if (message.content && handler.regex.test(message.content)){
                     var context = new HandlerContext(message,handler)
+                    await context.init()
                     if (Helper.ensurePermission(context,handler.enablePermission,handler.doPermissionError) && (!Helper.ensurePermission(context,handler.disablePermission,false))) {
                         handler.handle(context)
                     }

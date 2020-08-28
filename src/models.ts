@@ -1,8 +1,5 @@
 
 
-export interface TranslationModel {
-    
-}
 
 export interface UserModel {
     id:string
