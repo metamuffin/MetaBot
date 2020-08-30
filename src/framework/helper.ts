@@ -57,9 +57,9 @@ export class Helper {
         var in_quotes = false;
         var current_buffer:string = ""
         var args:Array<any> = [];
-
-        if (msg.search("\"") % 2 == 1) {
-            context.err(context.translation.core.general.parse_error.title,"")
+        
+        if ((msg.match(/"/g) || []).length % 2 == 1) {
+            context.err(context.translation.core.general.parse_error.title,"Uneven number of parenthesis.")
             return []
         }
         msg += " "

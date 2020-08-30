@@ -3,11 +3,11 @@ import { CommandContext, ICommand } from '../framework/command';
 import { EType, IdentifiedClass, Helper } from '../framework/helper';
 import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
 import ytsr from "ytsr"
-import { userInfo } from "os";
-const ytdl:any = require("ytdl-core")
+import ytdl from "ytdl-core"
 
 interface PlaylistElement {
-    display: string,
+    display_title: string,
+    display_author: string,
     url: string
 }
 
@@ -57,11 +57,11 @@ export class MusicPlayer extends IdentifiedClass {
             return
         }
         
-        if (this.loop) this.playlist.push( next )
+        if (this.loop) this.playlist.push(next)
         
         this.tchannel.send({embed:{
             color: 0x00FF00,
-            title: next?.display,
+            title: next?.display_title,
             description: "Now Playing."
         }})
 
@@ -70,6 +70,7 @@ export class MusicPlayer extends IdentifiedClass {
         if (!this.connection) this.tchannel.send("Internal Error: 234124325")
         this.streamDispatcher = this.connection?.play(ytdl(next?.url))
             .on("close",() => {
+                console.log("Stream closed");
                 this.isPlaying = false;
                 this.currentTitle = undefined;
                 this.next()
@@ -86,7 +87,8 @@ export class MusicPlayer extends IdentifiedClass {
             }})
         }
         this.playlist.push({
-            display: info.player_response.videoDetails.title,
+            display_title: info.player_response.videoDetails.title,
+            display_author: info.player_response.videoDetails.author,
             url: info.video_url
         })
 
@@ -265,7 +267,7 @@ var CommandMusicQueue:ICommand = {
         if (!player) return
         var output = ""
         for (const i of player.playlist) {
-            output += `[${i.display.replace(/[\[\]]/,"")}](${i.url})\n`
+            output += `[${i.display_title.replace(/[\[\]]/,"")}](${i.url})\n`
         }
         if (player.playlist.length == 0) output = "*nothing enqueued*"
         c.log("Player Queue",output)
