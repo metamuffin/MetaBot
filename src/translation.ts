@@ -20,6 +20,11 @@ export interface TranslationModel {
             help_subcommands: string
             title_generic: string
             none: string
+            more_help: string
+            path_desc: string
+            alias: string
+            no_description: string
+            not_enabled: string
         }
     }
     core: {
@@ -58,12 +63,24 @@ export interface TranslationModel {
     }
     music: {
         no_player_found: string
+        nothing_playing: string
+        only_one_vote: string
+        stop: string,
+        skipped: string,
+        voteskip: string,
+        playback_scheduled: string,
+        now_playing: string,
+        playback_stopped: string,
+        queue_empty: string
         play: {
             not_in_a_voicechannel: string
         }
         loop: {
             state_updated_enable: string
             state_updated_disable: string
+        },
+        queue: {
+            nothing_enqueued: string
         }
     }
 }

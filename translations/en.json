@@ -27,7 +27,12 @@
       "help_description": "Description",
       "help_permission": "Required permission",
       "help_subcommands": "Subcommands",
-      "none": "None"
+      "none": "None",
+      "more_help": "More help can be found with the command: `{0}help <path>`",
+      "path_desc": "'path' is a list of names representing the path you go to a command or subcommand seperated by a `.`",
+      "alias": "Alias:",
+      "no_description": "No description",
+      "not_enabled": "Not Enabled"
     },
     "about": {
       "description": "Shows you some useless information about this bot."
@@ -88,9 +93,18 @@
     }
   },
   "music": {
+    "no_player_found": "No Music Player was found for your current voice channel.",
+    "nothing_playing": "Nothing is currently playing.",
+    "only_one_vote": "You can only vote once!",
+    "stop": "STOP!",
+    "skipped": "Skipped!",
+    "voteskip": "Voteskip",
+    "now_playing": "Now Playing.",
+    "queue_empty": "Queue empty!",
+    "playback_stopped": "Playback stopped",
+    "playback_scheduled": "Playback scheduled.",
     "play": {
       "description": "Plays Music",
-      "no_player_found": "No Music Player was found for your current voice channel.",
       "not_in_a_voicechannel": "You must be in a voice channel to use this command."
     },
     "skip": {
@@ -100,6 +114,10 @@
       "state_updated_enable": "State Updated. Loop mode Enabled.",
       "state_updated_disable": "State Updated. Loop mode Disabled.",
       "description": "Set loop state for music playback."
+    },
+    "queue": {
+      "description": "Shows all enqueued songs.",
+      "nothing_enqueued": "nothing enqueued"
     }
   },
   "voice_assistant":{

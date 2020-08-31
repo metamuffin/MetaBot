@@ -4,6 +4,7 @@ import { EType, IdentifiedClass, Helper } from '../framework/helper';
 import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
 import ytsr from "ytsr"
 import ytdl from "ytdl-core"
+import { TranslationModel } from "../translation";
 
 interface PlaylistElement {
     display_title: string,
@@ -20,13 +21,13 @@ export class MusicPlayer extends IdentifiedClass {
     public isPlaying:boolean = false
     public voters:Array<string> = [];
     public streamDispatcher:StreamDispatcher|undefined = undefined;
-    public language:string = "en";
     public loop:boolean = false;
     public currentTitle:PlaylistElement|undefined = undefined
+    public translation: TranslationModel;
 
-    constructor(vchannel:VoiceChannel,tchannel:TextChannel, lang:string){
+    constructor(vchannel:VoiceChannel,tchannel:TextChannel, translation: TranslationModel){
         super()
-        this.language = lang
+        this.translation = translation
         this.vchannel = vchannel
         this.tchannel = tchannel
         players.push(this)
@@ -48,8 +49,8 @@ export class MusicPlayer extends IdentifiedClass {
         if (!next){
             this.tchannel.send({embed:{
                 color: 0x00FF00,
-                title: "Queue empty!",
-                description: "Playback stopped"
+                title: this.translation.music.queue_empty,
+                description: this.translation.music.playback_stopped
             }})
             setTimeout(() => {
                 if (!this.isPlaying) this.destroy()
@@ -62,7 +63,7 @@ export class MusicPlayer extends IdentifiedClass {
         this.tchannel.send({embed:{
             color: 0x00FF00,
             title: next?.display_title,
-            description: "Now Playing."
+            description: this.translation.music.now_playing
         }})
 
         this.isPlaying = true;
@@ -83,7 +84,7 @@ export class MusicPlayer extends IdentifiedClass {
             this.tchannel.send({embed:{
                 color: 0x00FF00,
                 title: info.player_response.videoDetails.title,
-                description: "Playback scheduled."
+                description: this.translation.music.playback_scheduled
             }})
         }
         this.playlist.push({
@@ -101,16 +102,16 @@ export class MusicPlayer extends IdentifiedClass {
         if (!this.isPlaying){
             this.tchannel.send({embed:{
                 color:0xFF0000,
-                title: "Error",
-                description: "Nothing is currently playing."
+                title: this.translation.error,
+                description: this.translation.music.nothing_playing
             }})
             return
         }
         if (this.voters.includes(user.id)){
             this.tchannel.send({embed:{
                 color:0xFF0000,
-                title: "STOP!",
-                description: "You can only vote once!"
+                title: this.translation.music.stop,
+                description: this.translation.music.only_one_vote
             }})
             return
         }
@@ -119,8 +120,8 @@ export class MusicPlayer extends IdentifiedClass {
         
         this.tchannel.send({embed:{
             color:0xFFFF00,
-            title: (skipped) ? "Skipped" : "",
-            description: `Voteskip (${this.voters.length} / ${Math.ceil((this.vchannel.members.size - 1) / 2)})`
+            title: (skipped) ? this.translation.music.skipped : "",
+            description: `${this.translation.music.voteskip} (${this.voters.length} / ${Math.ceil((this.vchannel.members.size - 1) / 2)})`
         }})
         
         if (skipped){
@@ -188,7 +189,7 @@ var CommandMusicPlay:ICommand = {
 
             var player = getMusicPlayer(c.message.member.voice.channel)
             if (!player) {
-                player = new MusicPlayer(c.message.member.voice.channel,c.channel,await c.getAuthorLang())
+                player = new MusicPlayer(c.message.member.voice.channel,c.channel,c.translation)
             }
             player?.add(url)
 
@@ -269,7 +270,7 @@ var CommandMusicQueue:ICommand = {
         for (const i of player.playlist) {
             output += `[${i.display_title.replace(/[\[\]]/,"")}](${i.url})\n`
         }
-        if (player.playlist.length == 0) output = "*nothing enqueued*"
+        if (player.playlist.length == 0) output = `*${c.translation.music.queue.nothing_enqueued}*`
         c.log("Player Queue",output)
     }
 }

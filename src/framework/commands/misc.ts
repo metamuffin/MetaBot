@@ -17,10 +17,11 @@ var CommandMiscAbout:ICommand = {
     requiredPermission: null,
     handle: (c) => {
         var out = "";
-        out += "This Bot is powered by MetaBot by MetaMuffin.\n"
+        out += "This Bot is powered by MetaBot.\n"
         out += "MetaBot is a open-source framework that makes creating bots easier by handling stuff like permissions, modules, data-storage and more.\n"
         out += "MetaBot is licenced under the GNU General Public Licence Version 3, so feel free to contribute or modify this project.\n"
-        out += "See the source, issue-tracker, feauture-suggestions and documentation on https://www.github.com/MetaMuffin/MetaBot !"
+        out += "See the source, issue-tracker, feauture-suggestions and documentation on https://www.github.com/MetaMuffin/MetaBot!"
+        out += "Active contributers: only MetaMuffin :("
         c.log("About",out)
     }
 }
@@ -44,15 +45,15 @@ var CommandMiscHelp:ICommand = {
             var outstr = ""
             for (const mod of App.modules) {
                 if (!((await c.getServerDoc()).enabledModules.includes(mod.name))){
-                    outstr += `~~${mod.name}~~: Not Enabled\n`
+                    outstr += `~~${mod.name}~~: ${c.translation.misc.help.not_enabled}\n`
                     continue
                 }
                 outstr += `**__${mod.name}__**\n`
                 for (const command of mod.commands) {
                     try{
                         var unsafe_translation: any = c.translation
-                        var desc: string = "*No description*"
-                        if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description || "No Description Specified."
+                        var desc: string = `*${c.translation.misc.help.no_description}*`
+                        if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description
                         outstr += `\u251c\u2500 **${command.name}:** ${desc}\n`
                     } catch (e) {
                         c.err("There may be something missing in the help because of a missing translation :(",`Error on \`${mod.name}.${command.name}\``)
@@ -60,15 +61,15 @@ var CommandMiscHelp:ICommand = {
                     }
                 }
             }
-            outstr += "\nMore help can be found with the command: `"+App.prefix+"help <path>`\n"
-            outstr += "'path' is a list of names representing the path you go to a command or subcommand seperated by a `.`"
+            outstr += "\n" + c.translation.misc.help.more_help.replace("{0}",App.prefix) + "\n"
+            outstr += c.translation.misc.help.path_desc + "\n"
             c.log(c.translation.misc.help.title_generic,outstr)
         } else {
             var find_command = (com:ICommand,names:Array<string>,path:Array<string>):string => {
                 if (names.length < 1){
                     var out = ""
                     out += `**__${com.name}__**\n`
-                    out += `Alias: ${com.alias.join(", ")}\n\n`
+                    out += `${c.translation.misc.help.alias} ${com.alias.join(", ")}\n\n`
                     out += `${c.translation.misc.help.help_description}: ${Helper.deepGet(c.translation,path).description}\n\n`
                     out += `${c.translation.misc.help.help_permission}: \`${com.requiredPermission}\`\n`
                     out += `${c.translation.misc.help.help_subcommands}: ${(com.useSubcommands) ? (com.subcommmands.map(sc=>sc.name).join(", ")) : c.translation.misc.help.none}` 
@@ -120,7 +121,7 @@ var CommandMiscEval:ICommand = {
         try {
             p = eval(c.args[0]).toString()
         } catch (e) {
-            c.err("Error",e)
+            c.err(c.translation.error,e)
         } finally {
             c.log("",`\`${p}\``)
         }
