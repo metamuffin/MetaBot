@@ -3,9 +3,20 @@ import { IModule } from "../module"
 import { EType, Helper } from "../helper"
 import { App } from "../core"
 import { Database } from "../database"
+import { TranslationModel } from "../../translation"
 
 
-
+export function typeToName(type: EType, t: TranslationModel): string {
+    var n = "Unknown"
+    if (type == EType.String) n = t.core.general.types.string
+    else if (type == EType.Integer) n = t.core.general.types.int
+    else if (type == EType.Boolean) n = t.core.general.types.boolean
+    else if (type == EType.Float) n = t.core.general.types.float
+    else if (type == EType.MemberData) n = t.core.general.types.member
+    else if (type == EType.MemberDataForServer) n = t.core.general.types.member
+    else if (type == EType.Command) n = t.core.general.types.command
+    return n
+}
 
 
 var CommandMiscAbout:ICommand = {
@@ -51,10 +62,11 @@ var CommandMiscHelp:ICommand = {
                 outstr += `**__${mod.name}__**\n`
                 for (const command of mod.commands) {
                     try{
-                        var unsafe_translation: any = c.translation
-                        var desc: string = `*${c.translation.misc.help.no_description}*`
-                        if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description
-                        outstr += `\u251c\u2500 **${command.name}:** ${desc}\n`
+                        //var unsafe_translation: any = c.translation
+                        //var desc: string = `*${c.translation.misc.help.no_description}*`
+                        //if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description
+                        //outstr += `\u251c\u2500 **${command.name}:** ${desc}\n`
+                        outstr += `\u251c\u2500 **${command.name}:**\n`
                     } catch (e) {
                         c.err("There may be something missing in the help because of a missing translation :(",`Error on \`${mod.name}.${command.name}\``)
                         console.log(`[ERROR] ${command.name}`);
@@ -69,10 +81,18 @@ var CommandMiscHelp:ICommand = {
                 if (names.length < 1){
                     var out = ""
                     out += `**__${com.name}__**\n`
-                    out += `${c.translation.misc.help.alias} ${com.alias.join(", ")}\n\n`
-                    out += `${c.translation.misc.help.help_description}: ${Helper.deepGet(c.translation,path).description}\n\n`
+                    out += `${c.translation.misc.help.alias} ${com.alias.join(", ")}\n`
+                    out += `${c.translation.misc.help.arguments}`
+                    if (com.argtypes.length == 0) out += c.translation.misc.help.none + "\n"
+                    else {
+                        out += "\n"
+                        for (const a of com.argtypes) {
+                            out += `- \`${a.name}\`: ${typeToName(a.type,c.translation)} (${a.optional ? c.translation.misc.help.optional : c.translation.misc.help.required})\n`
+                        }
+                    }
+                    out += `${c.translation.misc.help.help_description}: ${Helper.deepGet(c.translation,path)?.description || c.translation.misc.help.no_description}\n\n`
                     out += `${c.translation.misc.help.help_permission}: \`${com.requiredPermission}\`\n`
-                    out += `${c.translation.misc.help.help_subcommands}: ${(com.useSubcommands) ? (com.subcommmands.map(sc=>sc.name).join(", ")) : c.translation.misc.help.none}` 
+                    out += `${c.translation.misc.help.help_subcommands}: ${(com.useSubcommands) ? ("`" + com.subcommmands.map(sc=>sc.name).join("`, `") + "`") : c.translation.misc.help.none}` 
                     return out
                 }
                 if (com.useSubcommands){
@@ -128,12 +148,31 @@ var CommandMiscEval:ICommand = {
     }
 }
 
+export var CommandMiscEcho:ICommand = {
+    name: "echo",
+    alias: [],
+    argtypes: [
+        {
+            name: "Text",
+            type: EType.String,
+            optional: false
+        }
+    ],
+    subcommmands: [],
+    useSubcommands: false,
+    requiredPermission: null,
+    handle: (c) => {
+        c.channel.send(c.args[0])
+    }
+}
+
 export var ModuleMisc:IModule = {
     name: "misc",
     commands: [
         CommandMiscAbout,
         CommandMiscHelp,
-        CommandMiscEval
+        CommandMiscEval,
+        CommandMiscEcho
     ],
     handlers: [],
     init: async () => {

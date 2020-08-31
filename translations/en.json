@@ -11,13 +11,21 @@
     "general":{
       "command_not_found": "Command not found.",
       "parse_error":{
-          "title":"Parsing Error!",
-          "float_invalid":"One floating point argument is not a valid number.",
-          "int_invalid":"One integer argument is not a valid number.",
-          "not_enough_args":"You did not specify all the required arguments.",
-          "member_id_not_an_integer":"The specified member-id is not an integer.",
-          "member_not_found": "The member-id you've specified couldn't be found on this server."
-        }
+        "title":"Parsing Error!",
+        "float_invalid":"One floating point argument is not a valid number.",
+        "int_invalid":"One integer argument is not a valid number.",
+        "not_enough_args":"You did not specify all the required arguments.",
+        "member_id_not_an_integer":"The specified member-id is not an integer.",
+        "member_not_found": "The member-id you've specified couldn't be found on this server."
+      },
+      "types": {
+        "string": "text",
+        "int": "integer",
+        "float": "floating-point number",
+        "boolean": "boolean value",
+        "member": "member of this server",
+        "command": "command"
+      }
     }
   },
   "misc": {
@@ -32,7 +40,10 @@
       "path_desc": "'path' is a list of names representing the path you go to a command or subcommand seperated by a `.`",
       "alias": "Alias:",
       "no_description": "No description",
-      "not_enabled": "Not Enabled"
+      "not_enabled": "Not Enabled",
+      "arguments": "Arguments: ",
+      "required": "required",
+      "optional": "optional"
     },
     "about": {
       "description": "Shows you some useless information about this bot."

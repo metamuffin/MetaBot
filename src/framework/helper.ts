@@ -59,17 +59,17 @@ export class Helper {
         var args:Array<any> = [];
         
         if ((msg.match(/"/g) || []).length % 2 == 1) {
-            context.err(context.translation.core.general.parse_error.title,"Uneven number of parenthesis.")
+            context.err(context.translation.core.general.parse_error.title,"Uneven number of quotes.")
             return []
         }
         msg += " "
 
         for (let i = 0; i < msg.length; i++) {
             const c = msg.charAt(i);
+            var not_escaped = (i != 0) ? (msg.charAt(i-1) != "\\") : true
             
         
-            if (c == " " && (!in_quotes)){
-                current_buffer = current_buffer.replace("\"","")
+            if (c == " " && (!in_quotes) && not_escaped){
                 var parsed = await this.parseArgument(current_buffer,c_arg.type,context)
                 if (parsed === undefined) {
                     context.err(context.translation.core.general.parse_error.title,"Argument invalid.")
@@ -86,9 +86,12 @@ export class Helper {
                 current_buffer = "";
 
             }
-            if (c=="\""){
+
+            if (c=="\"" && not_escaped){
                 in_quotes =! in_quotes
+                continue
             }
+            if (c=="\\" && not_escaped) continue
 
             current_buffer += c
         }
@@ -114,7 +117,7 @@ export class Helper {
             try {
                 if (buffer.trim() == "") throw new Error()
                 r = parseInt(buffer.trim());
-                if (r == NaN) throw Error()
+                if (r === NaN) throw Error()
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.int_invalid);
                 r = undefined
@@ -144,22 +147,23 @@ export class Helper {
             } finally {
                 console.log(buffer.trim());
                 r = await Database.getExistingUserDoc(buffer.trim())
-                if (!r) {
+                if (!r && buffer.trim() != "default") {
                     return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
                 }
                 r = await Database.getUserDocForServer(buffer.trim(),context.server.id)
             }
         }
         if (type == EType.Boolean) {
-            r = (buffer.trim() == "1" || buffer.trim() == "on" || buffer.trim() == "true" || buffer.trim() == "enable" || buffer.trim() == "enabled")
+            r = ["on","true","enable","enabled","1","yes","y"].includes(buffer.trim().toLowerCase())
         }
         return r
     }
 
 
-    public static deepGet(obj:any,path:Array<string>){
+    public static deepGet(obj:any,path:Array<string>): any|undefined{
         var cur = obj
         for (const key of path) {
+            if (!cur[key]) return undefined
             cur = cur[key]
         }
         return cur

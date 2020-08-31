@@ -25,6 +25,9 @@ export interface TranslationModel {
             alias: string
             no_description: string
             not_enabled: string
+            arguments: string,
+            required: string,
+            optional: string
         }
     }
     core: {
@@ -37,6 +40,14 @@ export interface TranslationModel {
                 int_invalid: string
                 member_id_not_an_integer: string
                 member_not_found: string
+            },
+            types: {
+                string: string,
+                int: string,
+                float: string,
+                boolean: string,
+                member: string,
+                command: string
             }
         }
         permission: {

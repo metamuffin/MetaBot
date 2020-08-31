@@ -131,6 +131,8 @@ var CommandPermissionUsePermToken:ICommand = {
             ud.permissions.push("*")
             await Database.updateUserDocForServer(ud);
             c.log("Success",`Granted all permissions to ${c.author.username}`)
+        } else {
+            c.err("Du KEK!","Das darfst du nicht!")
         }
     }
 }

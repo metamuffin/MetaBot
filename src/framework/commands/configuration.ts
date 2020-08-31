@@ -88,7 +88,6 @@ var CommandConfigurationLanguage:ICommand = {
         ua.language = lc.toLowerCase();
         await c.updateAuthorDoc(ua)
         c.log("Settings changed successfully!","The next time you run any command, the language will be updated.");
-        
     }
 }
 

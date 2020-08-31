@@ -227,6 +227,7 @@ var CommandMusicVolume:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
+        if (c.args[0] < 0.2 || c.args[0] > 10) return c.err(c.translation.error,"Volume out of range")
         var player = getMusicPlayerForUser(c)
         if (!player) return
         player.streamDispatcher?.setVolume(c.args[0])

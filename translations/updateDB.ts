@@ -8,6 +8,7 @@ async function main() {
     await dbclient.connect()
     var db = dbclient.db("metabot")
     var tc = db.collection<TranslationModel>("translation");
+    tc.deleteMany({})
     Promise.all(["en"].map(lang => (async () => {
         console.log(`Loading ${lang}`);
         var j = JSON.parse(readFileSync(`translations/${lang}.json`).toString())

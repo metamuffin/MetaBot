@@ -123,7 +123,7 @@ export class Database {
 
     public static async createUserForServer(id:string,gid:string):Promise<UserModelForServer> {
         if (VERBOSE_DATABASE_LOGS) console.log(`Creating new user doc on server for ${id} on ${gid}`);
-        var j:UserModelForServer = JSON.parse((await readFile("./defaults/default_user_for_server.json")).toString())
+        var j:UserModelForServer = await Database.getExistingUserDocForServer("default",gid) || JSON.parse((await readFile("./defaults/default_user_for_server.json")).toString())
         j.id = id;
         j.gid = gid;
         var user = await this.getUserDoc(id);
