@@ -79,7 +79,16 @@ export class MusicPlayer extends IdentifiedClass {
     }
 
     async add(search:string){
-        var info = await ytdl.getInfo(search)
+        try {
+            var info = await ytdl.getInfo(search)
+        } catch(e) {
+            this.tchannel.send({embed:{
+                color: 0xFF0000,
+                title: this.translation.error,
+            }})
+            return this.next()
+        }
+
         if (this.isPlaying){
             this.tchannel.send({embed:{
                 color: 0x00FF00,
@@ -177,7 +186,7 @@ var CommandMusicPlay:ICommand = {
             if (c.args[0].match(/https?:\/\/.+/i)) {
                 url = c.args[0]
             } else {
-                var results = await ytsr(c.args[0],{limit:1})
+                var results = await ytsr(c.args[0],{limit:10})
                 console.log(results);
                 
                 for (const r of results.items) {
@@ -186,7 +195,7 @@ var CommandMusicPlay:ICommand = {
                     }
                 }
             }
-
+            if (url == "") return c.err(c.translation.error,"")
             var player = getMusicPlayer(c.message.member.voice.channel)
             if (!player) {
                 player = new MusicPlayer(c.message.member.voice.channel,c.channel,c.translation)
@@ -227,7 +236,10 @@ var CommandMusicVolume:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: (c) => {
-        if (c.args[0] < 0.2 || c.args[0] > 10) return c.err(c.translation.error,"Volume out of range")
+        console.log(c.args);
+        
+        if ((c.args[0] < 0.2 || c.args[0] > 5) && c.args[0] != -1) return c.err(c.translation.error,"Volume out of range")
+        if (c.args[0] == -1) c.args[0] = 10000
         var player = getMusicPlayerForUser(c)
         if (!player) return
         player.streamDispatcher?.setVolume(c.args[0])

@@ -106,8 +106,12 @@ export class Helper {
         if (type == EType.Float) {
             try {
                 if (buffer.trim() == "") throw new Error()
+                console.log(r);
+                
                 r = parseFloat(buffer.trim());
-                if (r === NaN) throw Error()
+                console.log(r);
+                
+                if (r == NaN || Number.isNaN(r)) throw Error()
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.float_invalid);
                 r = undefined
@@ -117,7 +121,7 @@ export class Helper {
             try {
                 if (buffer.trim() == "") throw new Error()
                 r = parseInt(buffer.trim());
-                if (r === NaN) throw Error()
+                if (r == NaN || Number.isNaN(r)) throw Error()
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.int_invalid);
                 r = undefined
