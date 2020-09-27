@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { MongoClient } from "mongodb"
 import { TranslationModel } from "../src/translation";
-import { dist_language_keys } from "./translate";
+import { dist_language_keys, source_language_key } from "./translate";
 
 
 async function main() {
@@ -10,7 +10,7 @@ async function main() {
     var db = dbclient.db("metabot")
     var tc = db.collection<TranslationModel>("translation");
     tc.deleteMany({})
-    Promise.all(dist_language_keys.map(lang => (async () => {
+    Promise.all([...dist_language_keys,source_language_key].map(lang => (async () => {
         console.log(`Loading ${lang}`);
         var j = JSON.parse(readFileSync(`translations/${lang}.json`).toString())
         await tc.insertOne(j)
@@ -18,3 +18,4 @@ async function main() {
     })).map(f => f()));
 }
 main()
+

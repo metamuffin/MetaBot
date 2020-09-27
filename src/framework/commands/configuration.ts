@@ -79,9 +79,10 @@ var CommandConfigurationLanguage:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: async (c:CommandContext) => {
-        var lc = c.args[0]
-        if (await Database.collectionTranslation.find({lang: lc})){
-            c.err("ERROR", "Language Code invalid");
+        var lc: string = c.args[0]
+        if (!await Database.getTranslationByName(lc.toLowerCase())){
+            if (lc.length != 2) return c.err("ERROR", "Language Code invalid");
+            c.err("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
             return
         }
         var ua = await c.getAuthorDoc()

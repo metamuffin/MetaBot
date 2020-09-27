@@ -79,7 +79,8 @@ export class Database {
 
 
     public static async getTranslationByName(id:string):Promise<TranslationModel | undefined> {
-        var res: TranslationModel | null = await this.collectionTranslation.findOne({lang: id})
+        console.log(`Retrieving translation for ${id}`);
+        var res: TranslationModel | null = (await Database.collectionTranslation.find({lang: id}).toArray())[0]
         if (!res) return undefined
         return res
     }

@@ -5,8 +5,8 @@ const translatte = require("translatte")
 
 
 
-export const dist_language_keys = ["de","ru","fr"]
-const source = "en"
+export const dist_language_keys = ["de","ru","fr","es","ja","it"]
+export const source_language_key = "en"
 
 async function translateA(from: string, to: string, text: string): Promise<string> {
     var o = await translatte(text, {to: to})
@@ -16,10 +16,10 @@ async function translateA(from: string, to: string, text: string): Promise<strin
 }
 
 export async function translateDB() {
-    var source_o = JSON.parse(readFileSync(`./translations/${source}.json`).toString())
+    var source_o = JSON.parse(readFileSync(`./translations/${source_language_key}.json`).toString())
     
     for (const lang of dist_language_keys) {
-        console.log(`Translating from ${source} to ${lang}`);
+        console.log(`Translating from ${source_language_key} to ${lang}`);
         
         
         const recursiveTranslate = async (o: any): Promise<any> => {
@@ -28,7 +28,7 @@ export async function translateDB() {
                 if (o.hasOwnProperty(key)) {
                     const value = o[key];
                     if (typeof value == "string") {
-                        out[key] = await translateA(source,lang,value)
+                        out[key] = await translateA(source_language_key,lang,value)
                     } else if (typeof value == "object") {
                         out[key] = await recursiveTranslate(value)
                     } else {
