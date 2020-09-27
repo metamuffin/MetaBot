@@ -1,0 +1,136 @@
+{
+  "lang": "fr",
+  "error": "Erreur",
+  "core": {
+    "permission": {
+      "no_permission": {
+        "title": "Vous ne disposez pas des autorisations pour exécuter cette commande.",
+        "description": "Vous avez besoin `{}` perm de le faire."
+      }
+    },
+    "general": {
+      "command_not_found": "Commande non trouvée.",
+      "parse_error": {
+        "title": "Erreur d'analyse!",
+        "float_invalid": "Un argument en virgule flottante est pas un nombre valide.",
+        "int_invalid": "Un argument entier est pas un nombre valide.",
+        "not_enough_args": "Vous ne spécifiez pas tous les arguments nécessaires.",
+        "member_id_not_an_integer": "L'élément-id spécifié est un nombre entier.",
+        "member_not_found": "Le membre ID que vous avez spécifié n'a pas pu être trouvée sur ce serveur."
+      },
+      "types": {
+        "string": "texte",
+        "int": "entier",
+        "float": "nombre à virgule flottante",
+        "boolean": "valeur booléenne",
+        "member": "membre de ce serveur",
+        "command": "commander"
+      }
+    }
+  },
+  "misc": {
+    "help": {
+      "description": ", L'aide est",
+      "title_generic": "Aidez-moi",
+      "help_description": "Description",
+      "help_permission": "autorisation requise",
+      "help_subcommands": "subcommands",
+      "none": "Aucun",
+      "more_help": "Plus d'aide peut être trouvé avec la commande suivante: `{0} help <path>`",
+      "path_desc": "« Chemin » est une liste de noms représentant le chemin que vous allez à une commande ou par un sous-commande `seperated .`",
+      "alias": "Alias:",
+      "no_description": "No description",
+      "not_enabled": "Pas activé",
+      "arguments": "Arguments:",
+      "required": "obligatoire",
+      "optional": "optionnel"
+    },
+    "about": {
+      "description": "vous montre quelques informations inutiles sur ce bot."
+    },
+    "save": { "description": "Enregistre la base de données." },
+    "eval": { "description": "Code Évalue." }
+  },
+  "permission": {
+    "permission": {
+      "success": "mise à jour de l'autorisation réussie!",
+      "add_success": "`{0}` a maintenant la permission `{1}`",
+      "remove_success": "`{0}` maintenant ne marche pas avoir la permission `{1}` plus.",
+      "description": "Configurer les autorisations",
+      "permission_not_found": "L'utilisateur spécifié ont déjà cette autorisation ne marche pas.",
+      "permission_list": "Liste d'autorisation:"
+    }
+  },
+  "config": {
+    "language": { "description": "Changer la langue" },
+    "module": {
+      "enable": { "description": "Permet à un module." },
+      "disable": { "description": "Un module désactive." },
+      "description": "vous permet d'activer et de modules handicapés sur ce serveur.",
+      "error_module_not_found": "Le module « {0} » n'a pas été trouvé.",
+      "error_already_enabled": "Le module '{0}' est déjà activé.",
+      "error_already_disabled": "Le module '{0}' est déjà désactivé.",
+      "success_enabled": "Le module est maintenant activé sur ce serveur.",
+      "success_disabled": "Le module est maintenant désactivé sur ce serveur."
+    }
+  },
+  "test": {
+    "ping": { "description": "Juste pings vous." },
+    "getperm": { "description": "vous donne une permission." },
+    "testui": {
+      "description": "Tests si les travaux composants de l'interface comme le devrait."
+    }
+  },
+  "dnd": {
+    "dice": {
+      "description": "Rolls dés avec la quantité spécifiée de numéros pour vous."
+    },
+    "createmonster": { "description": "Crée un monstre pour le MDN." }
+  },
+  "music": {
+    "no_player_found": "Pas de lecteur de musique n'a été trouvé pour votre canal vocal en cours.",
+    "nothing_playing": "Rien n'est en cours de lecture.",
+    "only_one_vote": "Vous pouvez voter seulement une fois!",
+    "stop": "ARRÊTEZ!",
+    "skipped": "Ignoré!",
+    "voteskip": "Votskip",
+    "now_playing": "Lecture en cours.",
+    "queue_empty": "File d'attente vide!",
+    "playback_stopped": "elle a été arrêtée",
+    "playback_scheduled": "La lecture programmée.",
+    "play": {
+      "description": "Joue de la musique",
+      "not_in_a_voicechannel": "Vous devez être dans un canal vocal à utiliser cette commande."
+    },
+    "skip": { "description": "pistes Voteskip de la file d'attente" },
+    "loop": {
+      "state_updated_enable": "État Mise à jour. Mode Loop Activé.",
+      "state_updated_disable": "État Mise à jour. Mode Loop Désactivé.",
+      "description": "Définir l'état de la boucle pour la lecture de musique."
+    },
+    "queue": {
+      "description": "Affiche toutes les chansons en file d'attente.",
+      "nothing_enqueued": "rien en file d'attente"
+    }
+  },
+  "voice_assistant": {
+    "startva": {
+      "ok": "Assistant vocal en cours d'exécution.",
+      "description": "Lance l'assistant vocal"
+    },
+    "stopva": {
+      "ok": "Assistant vocal arrêté.",
+      "description": "Arrête l'assistant vocal"
+    }
+  },
+  "tutorial": { "ping": { "description": "Ping!" } },
+  "moderator": {
+    "warning_title": "Avertissement!",
+    "warning_description": "Vous avez violé une règle de ce serveur.",
+    "warning_reason": "Raison:",
+    "blacklist": {
+      "blacklist_violation": "Blacklist regexp déclenché.",
+      "invite_pasted": "Collé une discorde invitation."
+    }
+  }
+}

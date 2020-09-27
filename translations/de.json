@@ -1,0 +1,136 @@
+{
+  "lang": "de",
+  "error": "Error",
+  "core": {
+    "permission": {
+      "no_permission": {
+        "title": "Sie verfügen nicht über die entsprechenden Berechtigungen, diesen Befehl auszuführen.",
+        "description": "Sie müssen `{perm}` es tun."
+      }
+    },
+    "general": {
+      "command_not_found": "Befehl nicht gefunden.",
+      "parse_error": {
+        "title": "Parsing-Fehler!",
+        "float_invalid": "Ein Floating-Point-Argument ist keine gültige Zahl.",
+        "int_invalid": "Ein Integer-Argument ist keine gültige Zahl.",
+        "not_enough_args": "Sie haben nicht alle erforderlichen Argumente angeben.",
+        "member_id_not_an_integer": "Die angegebene Element-id keine ganze Zahl ist.",
+        "member_not_found": "Die Mitglied-ID Sie angegeben haben kann auf diesem Server nicht gefunden werden."
+      },
+      "types": {
+        "string": "text",
+        "int": "ganze Zahl",
+        "float": "Gleitkommazahl",
+        "boolean": "boolean Wert",
+        "member": "Mitglied dieses Servers",
+        "command": "Befehl"
+      }
+    }
+  },
+  "misc": {
+    "help": {
+      "description": "Zeigt die Hilfe",
+      "title_generic": "Hilfe",
+      "help_description": "Beschreibung",
+      "help_permission": "Erforderliche Genehmigung",
+      "help_subcommands": "Subbefehle",
+      "none": "Keiner",
+      "more_help": "Weitere Hilfe kann mit dem Befehl gefunden werden: `{0} Hilfe <Pfad>`",
+      "path_desc": "‚Pfad‘ ist eine Liste von Namen, die den Pfad, den Sie durch einen `getrennt auf einen Befehl oder Unterbefehl gehen .`",
+      "alias": "Alias:",
+      "no_description": "Keine Beschreibung",
+      "not_enabled": "Nicht aktiviert",
+      "arguments": "Argumente:",
+      "required": "erforderlich",
+      "optional": "optional"
+    },
+    "about": {
+      "description": "Zeigt Ihnen einige nutzlose Informationen zu diesem bot."
+    },
+    "save": { "description": "Speichert die Datenbank." },
+    "eval": { "description": "Werte Code." }
+  },
+  "permission": {
+    "permission": {
+      "success": "Permission Update erfolgreich!",
+      "add_success": "`{0}` hat nun die Erlaubnis `{1}`",
+      "remove_success": "`{0}` jetzt haben doesnt die Erlaubnis `{1}` mehr.",
+      "description": "konfigurieren von Berechtigungen",
+      "permission_not_found": "Der angegebene Benutzer bereits tut diese Berechtigung haben.",
+      "permission_list": "Berechtigungsliste:"
+    }
+  },
+  "config": {
+    "language": { "description": "Ändere die Sprache" },
+    "module": {
+      "enable": { "description": "Aktiviert ein Modul." },
+      "disable": { "description": "Sperrt ein Modul." },
+      "description": "Ermöglicht das Aktivieren und deaktiviert Module auf diesem Server.",
+      "error_module_not_found": "Das Modul ‚{0}‘ konnte nicht gefunden werden.",
+      "error_already_enabled": "Das Modul ‚{0}‘ ist bereits aktiviert.",
+      "error_already_disabled": "Das Modul ‚{0}‘ ist bereits deaktiviert.",
+      "success_enabled": "Das Modul ist nun auf diesem Server aktiviert.",
+      "success_disabled": "Das Modul ist nun auf diesem Server deaktiviert."
+    }
+  },
+  "test": {
+    "ping": { "description": "Nur Pings Sie." },
+    "getperm": { "description": "Gibt Ihnen eine Erlaubnis." },
+    "testui": {
+      "description": "Prüft, ob die UI-Komponenten arbeiten wie die sollte."
+    }
+  },
+  "dnd": {
+    "dice": {
+      "description": "Rolls ein Würfel mit der angegebenen Menge von Zahlen für Sie."
+    },
+    "createmonster": { "description": "Erstellt ein Monster für DND." }
+  },
+  "music": {
+    "no_player_found": "Kein Musik-Player wurde für den aktuellen Sprachkanal gefunden.",
+    "nothing_playing": "Nichts wird zur Zeit zu spielen.",
+    "only_one_vote": "Sie können nur einmal abstimmen!",
+    "stop": "HALT!",
+    "skipped": "Übersprungenen!",
+    "voteskip": "Votskip",
+    "now_playing": "Läuft gerade.",
+    "queue_empty": "Warteschlange leer!",
+    "playback_stopped": "Die Wiedergabe wird beendet",
+    "playback_scheduled": "Die Wiedergabe geplant.",
+    "play": {
+      "description": "Spielt Musik",
+      "not_in_a_voicechannel": "Sie müssen in einem Sprachkanal sein, diesen Befehl zu verwenden."
+    },
+    "skip": { "description": "Voteskip Spuren der Warteschlange" },
+    "loop": {
+      "state_updated_enable": "Zustand aktualisiert. Loop-Modus aktiviert.",
+      "state_updated_disable": "Zustand aktualisiert. Wiederholungsmodus deaktiviert.",
+      "description": "Set Loop-Zustand für die Musikwiedergabe."
+    },
+    "queue": {
+      "description": "Zeigt alle die Warteschlange eingereiht Lieder.",
+      "nothing_enqueued": "nichts Warteschlange gestellt"
+    }
+  },
+  "voice_assistant": {
+    "startva": {
+      "ok": "Voice Assistant ausgeführt wird.",
+      "description": "Startet der Voice Assistant"
+    },
+    "stopva": {
+      "ok": "Voice Assistant gestoppt.",
+      "description": "Stoppen der Voice Assistant"
+    }
+  },
+  "tutorial": { "ping": { "description": "Klingeln!" } },
+  "moderator": {
+    "warning_title": "Warnung!",
+    "warning_description": "Sie haben eine Regel dieses Servers verletzt.",
+    "warning_reason": "Grund:",
+    "blacklist": {
+      "blacklist_violation": "Schwarze Liste regexp ausgelöst.",
+      "invite_pasted": "Geklebte eine Disharmonie einladen."
+    }
+  }
+}
