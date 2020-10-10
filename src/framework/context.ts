@@ -57,7 +57,7 @@ export class GenericContext {
     }
 
     public async log(title:string,description:string):Promise<Message> {
-        this.verboseClog(`${title} - ${description}`,["RESPONSE"])
+        this.verboseClog(`${title.split("\n")[0].substr(0,100)} - ${description.split("\n")[0].substr(0,100)}`,["RESPONSE"])
         return await this.send(title,description,0xa70fff)
     }
     

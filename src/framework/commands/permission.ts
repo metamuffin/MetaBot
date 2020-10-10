@@ -2,6 +2,7 @@ import { IModule } from '../module';
 import { ICommand } from '../command';
 import { EType, Helper } from '../helper';
 import { Database } from '../database';
+import { UserModelForServer } from '../../models';
 
 function genToken(len:number) {
     var result = '';
@@ -67,12 +68,13 @@ var CommandPermissionPermissionRemove:ICommand = {
     ],
     useSubcommands: false,
     subcommmands: [],
-    handle: (c) => {
+    handle: async (c) => {
         if (c.args.includes(undefined)) return
         if (!c.args[0].permissions.includes(c.args[1])) return c.err(c.translation.error,c.translation.permission.permission.permission_not_found)
-        if (c.args.includes(undefined)) return
         if (!Helper.ensurePermission(c,c.args[1],true)) return
-        c.args[0].permissions.push(c.args[1])
+        var ud: UserModelForServer = c.args[0]
+        ud.permissions.splice(ud.permissions.findIndex(p=>p==c.args[1]),1)
+        await Database.updateUserDocForServer(c.args[0])
         c.log(c.translation.permission.permission.success,c.translation.permission.permission.remove_success.replace("{0}",c.args[0].name).replace("{1}",c.args[1]));
     }
 }

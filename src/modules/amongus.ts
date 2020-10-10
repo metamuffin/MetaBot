@@ -8,26 +8,37 @@ import { DiscordAPIError } from "discord.js";
 import { getMusicPlayer, MusicPlayer, MusicPlayerControler } from "./music";
 
 class AmongusPlayerControler extends MusicPlayerControler {
-    public player: MusicPlayer;
+    private player: MusicPlayer;
+    private intervalHandle: NodeJS.Timeout;
 
     constructor(player: MusicPlayer) {
         super();
         this.player = player;
-    }
-    public async update() {
-        var notMuted = this.player.vchannel.members
-            .map((member) => !member.voice.selfMute)
-            .reduce((a, v) => (a + (v ? 1 : 0)), 0);
-        if (notMuted > 1) {
-            if(this.player.isPlaying) this.player.stop()
-        } else {
-            if(!this.player.isPlaying) this.player.next()
-        }
-    }
-    public init() {
-        setInterval(this.update, 2000);
+        player.controler = this;
+
+        this.intervalHandle = setInterval(async () => {
+            console.log(this.player.toString());
+
+            var notMuted = this.player.vchannel.members
+                .map((member) => !member.voice.selfMute)
+                .reduce((a, v) => a + (v ? 1 : 0), 0);
+            console.log(notMuted);
+            if (notMuted > 1) {
+                if (!this.player.isPaused) {
+                    this.player.pause();
+                    console.log("pause");
+                }
+            } else {
+                if (this.player.isPaused) {
+                    this.player.resume();
+                    console.log("resume");
+                }
+            }
+        }, 1000);
+        console.log(!this.player);
     }
     public destroy() {
+        clearInterval(this.intervalHandle);
         this.player.ensurePlaying();
         this.player.controler = undefined;
     }
@@ -49,30 +60,16 @@ var CommandAmongUsStart: ICommand = {
     handle: async (c) => {
         if (c.message?.member?.voice.channel) {
             var player = getMusicPlayer(c.message.member.voice.channel);
-            if (!player) {
-                player = new MusicPlayer(
-                    c.message.member.voice.channel,
-                    c.channel,
-                    c.translation
-                );
-                await player.create()
-            }
+            if (!player) return
             if (c.args[0]) {
-                player.playlist.push({display_author: "Blub",display_title: "blub",url: "https://www.youtube.com/watch?v=82rdLJWxRGM"})
-                player.playlist.push({display_author: "Blub",display_title: "blub",url: "https://www.youtube.com/watch?v=82rdLJWxRGM"})
-                player.playlist.push({display_author: "Blub",display_title: "blub",url: "https://www.youtube.com/watch?v=82rdLJWxRGM"})
-                if (player.controler)
-                    return c.err(c.translation.error, "Unknown 123235234");
+                if (player.controler) return c.err(c.translation.error, "Unknown 123235234");
                 var agcont = new AmongusPlayerControler(player);
-                player.controler = agcont;
-                await player.ensurePlaying()
-                agcont.init();
-                await agcont.update()
+                player.pause()
             } else {
                 if (player.controler instanceof AmongusPlayerControler) {
                     player.controler.destroy();
                 } else {
-                    c.err("Amongus mode not enabled", "");
+                    c.err("Amongus mode was not enabled", "");
                 }
             }
         } else {

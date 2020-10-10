@@ -1,6 +1,6 @@
 import { IModule } from "../framework/module";
 import { CommandContext, ICommand } from '../framework/command';
-import { EType, IdentifiedClass, Helper } from '../framework/helper';
+import { EType, IdentifiedClass, Helper, logWithTags } from '../framework/helper';
 import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } from "discord.js";
 import ytsr from "ytsr"
 import ytdl from "ytdl-core"
@@ -13,6 +13,7 @@ interface PlaylistElement {
 }
 
 export class MusicPlayerControler {
+    onTrackEnd(){}
 }
 
 export class MusicPlayer extends IdentifiedClass {
@@ -21,13 +22,16 @@ export class MusicPlayer extends IdentifiedClass {
     public connection:VoiceConnection|undefined = undefined
     public playlist:Array<PlaylistElement> = []
     public dlstream:any = undefined
+
     public isPlaying:boolean = false
+    public isPaused:boolean = false;
+
     public voters:Array<string> = [];
     public streamDispatcher:StreamDispatcher|undefined = undefined;
     public loop:boolean = false;
     public currentTitle:PlaylistElement|undefined = undefined
     public translation: TranslationModel;
-    public controler: MusicPlayerControler |undefined = undefined;
+    public controler: MusicPlayerControler | undefined = undefined;
 
     constructor(vchannel:VoiceChannel,tchannel:TextChannel, translation: TranslationModel){
         super()
@@ -35,14 +39,10 @@ export class MusicPlayer extends IdentifiedClass {
         this.vchannel = vchannel
         this.tchannel = tchannel
         players.push(this)
-        this.create()
     }
 
-    async stop() {
-        if (this.isPlaying) {
-            this.dlstream?.destroy()
-        }
-    }
+    pause() {this.streamDispatcher?.pause(); this.isPaused = true}
+    resume() {this.streamDispatcher?.resume(); this.isPaused = false}
 
     async create(){
         this.connection = await this.vchannel.join();
@@ -78,11 +78,11 @@ export class MusicPlayer extends IdentifiedClass {
 
         this.isPlaying = true;
         this.currentTitle = next
-        if (!this.connection) this.tchannel.send("Internal Error: 234124325")
+        if (!this.connection) return this.tchannel.send("Internal Error: 234124325")
         this.dlstream = ytdl(next?.url)
         this.streamDispatcher = this.connection?.play(this.dlstream)
             .on("close",() => {
-                console.log("Stream closed");
+                logWithTags(["MUSICPLAYER","STREAM"],"Stream closed");
                 this.isPlaying = false;
                 this.currentTitle = undefined;
                 this.next()
@@ -152,6 +152,7 @@ export class MusicPlayer extends IdentifiedClass {
 
     async ensurePlaying(){
         if (!this.isPlaying) await this.next()
+        else if (this.isPaused) this.streamDispatcher?.resume()
     }
 }
 
@@ -159,7 +160,7 @@ var players:Array<MusicPlayer> = []
 
 export var getMusicPlayer = (channel:VoiceChannel):MusicPlayer|undefined => {
     for (const p of players) {
-        if (p.vchannel.id = channel.id) return p
+        if (p.vchannel.id == channel.id) return p
     }
     return undefined;
 }
@@ -203,6 +204,7 @@ var CommandMusicPlay:ICommand = {
                 for (const r of results.items) {
                     if (r.type == "video") {
                         url = r.link
+                        break
                     }
                 }
             }
@@ -210,6 +212,7 @@ var CommandMusicPlay:ICommand = {
             var player = getMusicPlayer(c.message.member.voice.channel)
             if (!player) {
                 player = new MusicPlayer(c.message.member.voice.channel,c.channel,c.translation)
+                await player.create()
             }
             player?.add(url)
 
