@@ -1,5 +1,6 @@
 import { Message } from 'discord.js';
 import { GenericContext } from './context';
+import { logWithTags, messageLogNote } from './helper';
 
 
 
@@ -20,4 +21,8 @@ export class HandlerContext extends GenericContext {
         super(event)
         this.handler = handler
     }
+    public clog(s:string) {
+        logWithTags(["COMMAND",this.handler.name,...messageLogNote(this.message)],s)
+    }
+    
 }

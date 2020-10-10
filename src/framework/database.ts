@@ -8,8 +8,14 @@ import { Server } from 'http';
 import { readFile } from 'fs/promises';
 import { readFileSync } from 'fs';
 import { TranslationModel } from '../translation';
+import { logWithTags } from './helper';
 
 const VERBOSE_DATABASE_LOGS = false;
+
+function verboseDBLog(msg: string) {
+    if (!VERBOSE_DATABASE_LOGS) return
+    logWithTags(["DATABASE","VERBOSE"],msg)
+}
 
 
 export class Database {
@@ -37,16 +43,14 @@ export class Database {
 
     public static async getServerDoc(id:string): Promise<ServerModel> {
         var res: ServerModel|null = await this.collectionServer.findOne({id})
-        if (VERBOSE_DATABASE_LOGS) console.log(`Database retrieved value for server doc ${id}`);
-        if (VERBOSE_DATABASE_LOGS) console.log(res);
+        verboseDBLog(`Database retrieved value for server doc ${id}`);
         if (!res) res = await Database.createServer(id)
         return res
     }
 
     public static async getUserDoc(id:string): Promise<UserModel> {
         var res: UserModel|null = await this.collectionUser.findOne({id})
-        if (VERBOSE_DATABASE_LOGS) console.log(`Database retrieved value for user doc ${id}`);
-        if (VERBOSE_DATABASE_LOGS) console.log(res);
+        verboseDBLog(`Database retrieved value for user doc ${id}`);
         if (!res) res = await Database.createUser(id);
         return res
     }
@@ -79,35 +83,31 @@ export class Database {
 
 
     public static async getTranslationByName(id:string):Promise<TranslationModel | undefined> {
-        console.log(`Retrieving translation for ${id}`);
+        verboseDBLog(`Retrieving translation for ${id}`);
         var res: TranslationModel | null = (await Database.collectionTranslation.find({lang: id}).toArray())[0]
         if (!res) return undefined
         return res
     }
     
     public static async updateServerDoc(value: ServerModel) {
-        if (VERBOSE_DATABASE_LOGS) console.log(`Updating server doc for ${value.id} with`);
-        if (VERBOSE_DATABASE_LOGS) console.log(value);
+        verboseDBLog(`Updating server doc for ${value.id} with`);
         await Database.collectionServer.replaceOne({id: value.id}, value)
     }
 
     public static async updateUserDoc(value: UserModel) {
-        if (VERBOSE_DATABASE_LOGS) console.log(`Updating server doc for ${value.id} with`);
-        if (VERBOSE_DATABASE_LOGS) console.log(value);
+        verboseDBLog(`Updating server doc for ${value.id} with`);
         await Database.collectionUser.replaceOne({id: value.id},value)
     }
 
     public static async updateUserDocForServer(value: UserModelForServer) {
         var user = await Database.getUserDoc(value.id)
         user.servers[value.gid] = value
-        if (VERBOSE_DATABASE_LOGS) console.log(`Replacing user doc on server for ${value.id} on ${value.gid} with`);
-        if (VERBOSE_DATABASE_LOGS) console.log({replacement: value});
-        
+        verboseDBLog(`Replacing user doc on server for ${value.id} on ${value.gid} with`);
         await Database.updateUserDoc(user)
     }
 
     public static async createServer(id:string):Promise<ServerModel> {
-        if (VERBOSE_DATABASE_LOGS) console.log(`Created new server for ${id}`);
+        verboseDBLog(`Created new server for ${id}`);
         var j:ServerModel = JSON.parse((await readFile("./defaults/default_server.json")).toString())
         j.id = id;
         await Database.collectionServer.insertOne(j)
@@ -115,7 +115,7 @@ export class Database {
     }
     
     public static async createUser(id:string):Promise<UserModel> {
-        if (VERBOSE_DATABASE_LOGS) console.log(`Created new user for ${id}`);
+        verboseDBLog(`Created new user for ${id}`);
         var j:UserModel = JSON.parse((await readFile("./defaults/default_user.json")).toString())
         j.id = id;
         await Database.collectionUser.insertOne(j)
@@ -123,7 +123,7 @@ export class Database {
     }
 
     public static async createUserForServer(id:string,gid:string):Promise<UserModelForServer> {
-        if (VERBOSE_DATABASE_LOGS) console.log(`Creating new user doc on server for ${id} on ${gid}`);
+        verboseDBLog(`Creating new user doc on server for ${id} on ${gid}`);
         var j:UserModelForServer = await Database.getExistingUserDocForServer("default",gid) || JSON.parse((await readFile("./defaults/default_user_for_server.json")).toString())
         j.id = id;
         j.gid = gid;

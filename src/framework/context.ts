@@ -1,10 +1,11 @@
 import { IModule } from "./module";
-import { Helper } from "./helper";
+import { Helper, logWithTags, messageLogNote } from "./helper";
 import { Message, Guild, TextChannel, ColorResolvable, User } from "discord.js";
 
 import { Database } from "./database";
 import { ServerModel, UserModelForServer, UserModel } from "../models";
 import { TranslationModel } from "../translation";
+import { BOT_VERBOSE_MODE } from "./core";
 
 
 
@@ -29,12 +30,23 @@ export class GenericContext {
         var t:any = {} // TODO
         this.translation = t
     }
+
+    
+
+    public verboseClog(s:string,e?:Array<string>) {
+        if (BOT_VERBOSE_MODE) this.clog(s,e)
+    }
+
+    public clog(s:string,extraTags?: Array<string>) {
+        if (!extraTags) extraTags = [];
+        logWithTags(["GENERAL",...extraTags,...messageLogNote(this.message)],s)
+    }
     
     public async init(): Promise<boolean> {
         var t = await Database.getTranslation(this.message.author.id)
         
         if (!t) {
-            this.log("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
+            this.log("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. Also note that the current translations are done via a automatic translation and so might not be correct. https://www.github.com/MetaMuffin/Metabot")
             return false
         }
         this.translation = t
@@ -45,6 +57,7 @@ export class GenericContext {
     }
 
     public async log(title:string,description:string):Promise<Message> {
+        this.verboseClog(`${title} - ${description}`,["RESPONSE"])
         return await this.send(title,description,0xa70fff)
     }
     

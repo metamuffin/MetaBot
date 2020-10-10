@@ -1,11 +1,13 @@
 import { Database } from "./database";
 import { IModule } from "./module";
-import { Helper } from "./helper";
+import { Helper, logWithTags, messageLogNote } from "./helper";
 import { ICommand, CommandContext} from './command';
 import { loadNativeCommands } from "./commands/loader";
 import { HandlerContext } from "./handler";
 import { InterfaceHandler } from "./interfacing";
 import { Client, MessageReaction, User, Message, PartialUser } from "discord.js";
+
+export var BOT_VERBOSE_MODE = true;
 
 
 export class App {
@@ -40,7 +42,7 @@ export class App {
 
     public static async messageHandler(message: Message):Promise<void> {
         if (message.author.id == App.client.user?.id) return
-        console.log(message.content);
+        logWithTags(["MESSAGE",...messageLogNote(message)],message.content)
         
         
         if (InterfaceHandler.onMessage(message)) return        
@@ -60,21 +62,23 @@ export class App {
                 for (const h of m.commands){
                     var res = App.getMatchingCommand(h,c_names)
                     if (res.command != null){
-                        console.log("Found a matching command for " + message.content.split(" ")[0]);
                         foundCommand = true;
-
+                        
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
                         if (!await context.init()) return
+                        
+                        context.clog("Found a matching command for " + message.content.split(" ")[0]);
+                        
                         if (!context.args_pre) {
                             context.err("Too few or many arguments!","")
                         }
 
                         var permok = await Helper.ensurePermission(context,h.requiredPermission)
                         if (permok){
-                            console.log("Handling this Command.");
+                            context.clog("Executing command")
                             res.command.handle(context)
                         } else {
-                            console.log("Permission denied.");
+                            context.clog("Permission denied.");
                         }
                     }
                 }

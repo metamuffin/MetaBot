@@ -1,6 +1,7 @@
 import { Database } from "./database";
 import { CommandContext, IArgument } from "./command";
 import { GenericContext } from './context';
+import { Guild, Channel, TextChannel, Message, VoiceChannel, DMChannel } from "discord.js";
 
 export enum EType {
     String,
@@ -18,6 +19,23 @@ export class IdentifiedClass {
         this.id = Math.floor(Math.random()*10**16)
     }
 }
+
+export function logWithTags(tags:Array<string>, text: string) {
+    console.log(`[${tags.join("] [")}] ${text}`)
+}
+
+export function channelPath(server:Guild,channel:Channel):string {
+    var name = ""
+    if (channel instanceof TextChannel) name = channel.name;
+    else if (channel instanceof VoiceChannel) name = channel.name;
+    else if (channel instanceof DMChannel) name = "DM Channel (that should be impossible"
+    return `${server.name}/${name}`
+}
+export function messageLogNote(message:Message):Array<string> {
+    if (!message.guild) return []
+    return [channelPath(message.guild,message.channel), message.author.username + '#' + message.author.discriminator];
+}
+
 
 export class Helper {
     // Returns the name of command read from a Message that was interpreted as an command.
@@ -106,11 +124,7 @@ export class Helper {
         if (type == EType.Float) {
             try {
                 if (buffer.trim() == "") throw new Error()
-                console.log(r);
-                
-                r = parseFloat(buffer.trim());
-                console.log(r);
-                
+                r = parseFloat(buffer.trim())
                 if (r == NaN || Number.isNaN(r)) throw Error()
             } catch (e) {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.float_invalid);
@@ -134,7 +148,6 @@ export class Helper {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
                 r = undefined
             } finally {
-                console.log(buffer.trim());
                 r = await Database.getExistingUserDoc(buffer.trim())
                 if (!r) {
                     return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);
@@ -149,7 +162,6 @@ export class Helper {
                 context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_id_not_an_integer)
                 r = undefined
             } finally {
-                console.log(buffer.trim());
                 r = await Database.getExistingUserDoc(buffer.trim())
                 if (!r && buffer.trim() != "default") {
                     return context.err(context.translation.core.general.parse_error.title,context.translation.core.general.parse_error.member_not_found);

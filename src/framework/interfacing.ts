@@ -83,7 +83,7 @@ export class SelectUI extends GenericUI {
     }
     
     public handleReactionInteraction(reaction:MessageReaction,user:User):boolean {
-        console.log(reaction.emoji.name);
+        this.context.clog(reaction.emoji.name);
         
         var chosen = this.options.find((o) => o.icon == reaction.emoji.name)
         if (!chosen) return false
