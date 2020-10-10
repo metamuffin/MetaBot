@@ -1,7 +1,5 @@
 /.vscode
 /node_modules
 /build
-/src/modules/dnd.ts
 /npm-debug.log
-/src/modules/crypto.ts
-!/src/modules/tutorialmodule.ts
+/dist
