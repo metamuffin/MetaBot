@@ -93,7 +93,7 @@ var CommandModeratorRemoveLastMessages:ICommand = {
         }
         try {
             await c.channel.bulkDelete(msgs)
-        } catch (DiscordAPIError) {
+        } catch (e) {
             return c.err(c.translation.error,"I can only delete messages from the last 14 days because of the Discord API limitations. Sorry.")
         }
         setTimeout(async () => {
@@ -103,11 +103,31 @@ var CommandModeratorRemoveLastMessages:ICommand = {
     }
 }
 
+var CommandModeratorKick:ICommand = {
+    name: "kick",
+    alias: [],
+    requiredPermission: "debug.exec",
+    argtypes: [
+        {
+            name: "User ID",
+            optional: false,
+            type: EType.Integer
+        }
+    ],
+    subcommmands: [],
+    useSubcommands: false,
+    handle: async (c) => {
+        c.log("",`${c.args[0]}`);
+        //c.server.members.kick(c.args[0])
+    }
+}
+
 
 export var ModuleModerator:IModule = {
     name: "moderator",
     commands: [
-        CommandModeratorRemoveLastMessages
+        CommandModeratorRemoveLastMessages,
+        CommandModeratorKick,
     ],
     handlers: [
         HandlerModeratorBlacklist,

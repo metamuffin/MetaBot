@@ -12,18 +12,22 @@ interface PlaylistElement {
     url: string
 }
 
+export class MusicPlayerControler {
+}
 
 export class MusicPlayer extends IdentifiedClass {
     public vchannel:VoiceChannel
     public tchannel:TextChannel
     public connection:VoiceConnection|undefined = undefined
     public playlist:Array<PlaylistElement> = []
+    public dlstream:any = undefined
     public isPlaying:boolean = false
     public voters:Array<string> = [];
     public streamDispatcher:StreamDispatcher|undefined = undefined;
     public loop:boolean = false;
     public currentTitle:PlaylistElement|undefined = undefined
     public translation: TranslationModel;
+    public controler: MusicPlayerControler |undefined = undefined;
 
     constructor(vchannel:VoiceChannel,tchannel:TextChannel, translation: TranslationModel){
         super()
@@ -32,6 +36,12 @@ export class MusicPlayer extends IdentifiedClass {
         this.tchannel = tchannel
         players.push(this)
         this.create()
+    }
+
+    async stop() {
+        if (this.isPlaying) {
+            this.dlstream?.destroy()
+        }
     }
 
     async create(){
@@ -69,7 +79,8 @@ export class MusicPlayer extends IdentifiedClass {
         this.isPlaying = true;
         this.currentTitle = next
         if (!this.connection) this.tchannel.send("Internal Error: 234124325")
-        this.streamDispatcher = this.connection?.play(ytdl(next?.url))
+        this.dlstream = ytdl(next?.url)
+        this.streamDispatcher = this.connection?.play(this.dlstream)
             .on("close",() => {
                 console.log("Stream closed");
                 this.isPlaying = false;
@@ -146,7 +157,7 @@ export class MusicPlayer extends IdentifiedClass {
 
 var players:Array<MusicPlayer> = []
 
-var getMusicPlayer = (channel:VoiceChannel):MusicPlayer|undefined => {
+export var getMusicPlayer = (channel:VoiceChannel):MusicPlayer|undefined => {
     for (const p of players) {
         if (p.vchannel.id = channel.id) return p
     }
