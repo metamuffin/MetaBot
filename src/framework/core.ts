@@ -6,6 +6,7 @@ import { loadNativeCommands } from "./commands/loader";
 import { HandlerContext } from "./handler";
 import { InterfaceHandler } from "./interfacing";
 import { Client, MessageReaction, User, Message, PartialUser } from "discord.js";
+import { ensurePermission } from "./permission";
 
 export var BOT_VERBOSE_MODE = true;
 
@@ -73,7 +74,7 @@ export class App {
                             context.err("Too few or many arguments!","")
                         }
 
-                        var permok = await Helper.ensurePermission(context,h.requiredPermission)
+                        var permok = await ensurePermission(context,h.requiredPermission)
                         if (permok){
                             context.clog("Executing command")
                             res.command.handle(context)
@@ -87,7 +88,7 @@ export class App {
                 if (message.content && handler.regex.test(message.content)){
                     var context = new HandlerContext(message,handler)
                     if (!await context.init()) return
-                    if (Helper.ensurePermission(context,handler.enablePermission,handler.doPermissionError) && (!Helper.ensurePermission(context,handler.disablePermission,false))) {
+                    if (ensurePermission(context,handler.enablePermission,handler.doPermissionError) && (!ensurePermission(context,handler.disablePermission,false))) {
                         handler.handle(context)
                     }
                 }

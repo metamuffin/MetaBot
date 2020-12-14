@@ -18,6 +18,13 @@ export interface ServerModel {
     id:string
     enabledModules:Array<string>
     messageBlacklist:Array<string>
+    rolePermissions: {[key: string]: RolePermission}
+}
+
+export interface RolePermission {
+    grants: string[],
+    revokes: string[],
+    order: number[],
 }
 
 export interface GlobalModel {

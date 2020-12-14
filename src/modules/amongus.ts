@@ -1,10 +1,6 @@
 import { IModule } from "../framework/module";
-import { IHandler } from "../framework/handler";
-import { Database } from "../framework/database";
 import { EType, Helper } from "../framework/helper";
-import { GenericContext } from "../framework/context";
 import { ICommand } from "../framework/command";
-import { DiscordAPIError } from "discord.js";
 import { getMusicPlayer, MusicPlayer, MusicPlayerControler } from "./music";
 
 class AmongusPlayerControler extends MusicPlayerControler {
@@ -17,13 +13,11 @@ class AmongusPlayerControler extends MusicPlayerControler {
         player.controler = this;
 
         this.intervalHandle = setInterval(async () => {
-            console.log(this.player.toString());
-
+            
             var notMuted = this.player.vchannel.members
                 .map((member) => !member.voice.selfMute)
                 .reduce((a, v) => a + (v ? 1 : 0), 0);
-            console.log(notMuted);
-            if (notMuted > 1) {
+            if (notMuted > 3) {
                 if (!this.player.isPaused) {
                     this.player.pause();
                     console.log("pause");
@@ -47,7 +41,7 @@ class AmongusPlayerControler extends MusicPlayerControler {
 var CommandAmongUsStart: ICommand = {
     name: "amongusmode",
     alias: ["agmode"],
-    requiredPermission: "debug.experimental-commands",
+    requiredPermission: "amongus.mode",
     argtypes: [
         {
             name: "Status",

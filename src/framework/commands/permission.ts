@@ -3,6 +3,7 @@ import { ICommand } from '../command';
 import { EType, Helper } from '../helper';
 import { Database } from '../database';
 import { UserModelForServer } from '../../models';
+import { ensurePermission } from '../permission';
 
 function genToken(len:number) {
     var result = '';
@@ -39,7 +40,7 @@ var CommandPermissionPermissionAdd:ICommand = {
     handle: async (c) => {
         if (!c.args[0]) return
         if (!c.args[1]) return
-        if (!Helper.ensurePermission(c,c.args[1],true)) return
+        if (!ensurePermission(c,c.args[1],true)) return
         if (c.args[0].permissions.includes(c.args[1])) return c.err("Permission already applied.","")
         console.log({t1: c.args[0]});
         c.args[0].permissions.push(c.args[1])
@@ -71,7 +72,7 @@ var CommandPermissionPermissionRemove:ICommand = {
     handle: async (c) => {
         if (c.args.includes(undefined)) return
         if (!c.args[0].permissions.includes(c.args[1])) return c.err(c.translation.error,c.translation.permission.permission.permission_not_found)
-        if (!Helper.ensurePermission(c,c.args[1],true)) return
+        if (!ensurePermission(c,c.args[1],true)) return
         var ud: UserModelForServer = c.args[0]
         ud.permissions.splice(ud.permissions.findIndex(p=>p==c.args[1]),1)
         await Database.updateUserDocForServer(c.args[0])
