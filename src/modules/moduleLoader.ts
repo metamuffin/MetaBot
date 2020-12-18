@@ -7,16 +7,13 @@ import { ModuleTutorial } from "./tutorialmodule"
 //import { ModuleVoiceAssistant } from './voice-assistant';
 import { ModuleModerator } from "./moderator";
 import { ModuleAmongUs } from "./amongus";
+import { ModuleChannelmanager } from "./channelmanager";
 
 export function registerModules():void {
     App.modules.push(
-        /*
-        ModuleDND,
-        ModuleCrypto,
-        */
         ModuleTest, 
         ModuleMusic,
-        //ModuleVoiceAssistant,
+        ModuleChannelmanager,
         ModuleTutorial,
         ModuleModerator,
         ModuleAmongUs,

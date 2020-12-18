@@ -76,7 +76,6 @@ export class App {
 
                         var permok = await ensurePermission(context,h.requiredPermission)
                         if (permok){
-                            context.clog("Executing command")
                             res.command.handle(context)
                         } else {
                             context.clog("Permission denied.");

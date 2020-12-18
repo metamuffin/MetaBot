@@ -15,6 +15,8 @@ export class GenericContext {
     public message:Message
     public translation:TranslationModel
     public server:Guild
+    private disabled: boolean
+
 
     constructor (event:Message) {
         this.message = event
@@ -24,10 +26,10 @@ export class GenericContext {
         this.server = event.guild
         if (!(event.channel instanceof TextChannel)){
             throw new Error("Cannot use Commands in DM Channels")
-            return
         }
         this.channel = (event.channel instanceof TextChannel) ? event.channel : (():any=>{return null})()
         var t:any = {} // TODO
+        this.disabled = false
         this.translation = t
     }
 
@@ -61,7 +63,8 @@ export class GenericContext {
         return await this.send(title || "",description || "",0xa70fff)
     }
     
-    public async err (title:string,description:string):Promise<Message> {
+    public async err(title:string,description:string):Promise<Message | undefined> {
+        if (this.disabled) return
         return await this.send(title,description,0xff0000)
     }
 
@@ -96,6 +99,11 @@ export class GenericContext {
     }
     public async updateServerDoc(doc: ServerModel): Promise<void> {
         await Database.updateServerDoc(doc)
+    }
+
+    public async perm_catch(e: any) {
+        this.err("Missing permission.","Please inform the server owner to grant sufficient permission to MetaBot.")
+        this.disabled = true
     }
 
 }
