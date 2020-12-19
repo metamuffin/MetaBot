@@ -5,6 +5,7 @@ import { StreamDispatcher, TextChannel, User, VoiceChannel, VoiceConnection } fr
 import yts from "yt-search"
 import ytdl from "ytdl-core"
 import { TranslationModel } from "../translation";
+import { GenericContext } from "../framework/context";
 
 interface PlaylistElement {
     display_title: string,
@@ -198,8 +199,9 @@ var CommandMusicPlay: ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: async (c) => {
+        if (c.args[0].length < 2) return 
         if (c.message?.member?.voice.channel) {
-
+            
             var opts: yts.OptionsWithQuery = {
                 query: c.args[0],
                 pages: 1,
@@ -238,6 +240,12 @@ var CommandMusicSkip: ICommand = {
     }
 }
 
+export function preprocessMusicVolume(vol: number): undefined | number {
+    if ((vol < 0.2 || vol > 5) && vol != -1) return undefined
+    if (vol == -1) vol = 10000
+    return vol
+}
+
 var CommandMusicVolume: ICommand = {
     name: "volume",
     alias: ["vol"],
@@ -253,12 +261,11 @@ var CommandMusicVolume: ICommand = {
     useSubcommands: false,
     handle: (c) => {
         console.log(c.args);
-
-        if ((c.args[0] < 0.2 || c.args[0] > 5) && c.args[0] != -1) return c.err(c.translation.error, "Volume out of range")
-        if (c.args[0] == -1) c.args[0] = 10000
+        var vol = preprocessMusicVolume(c.args[0])
+        if (!vol) return c.err(c.translation.error, "Volume out of range")
         var player = getMusicPlayerForUser(c)
         if (!player) return
-        player.streamDispatcher?.setVolume(c.args[0])
+        player.streamDispatcher?.setVolume(vol)
     }
 }
 
