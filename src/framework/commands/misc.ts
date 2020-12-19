@@ -122,7 +122,7 @@ var CommandMiscHelp:ICommand = {
     }
 }
 
-
+/*
 var CommandMiscEval:ICommand = {
     name: "eval",
     alias: ["exec"],
@@ -146,7 +146,7 @@ var CommandMiscEval:ICommand = {
             c.log("",`\`${p}\``)
         }
     }
-}
+}*/
 
 export var CommandMiscEcho:ICommand = {
     name: "echo",
@@ -171,7 +171,7 @@ export var ModuleMisc:IModule = {
     commands: [
         CommandMiscAbout,
         CommandMiscHelp,
-        CommandMiscEval,
+        //CommandMiscEval,
         CommandMiscEcho
     ],
     handlers: [],

@@ -2,15 +2,17 @@ import { IModule } from '../module';
 import { ICommand } from '../command';
 import { EType, Helper } from '../helper';
 import { Database } from '../database';
-import { UserModelForServer } from '../../models';
-import { ensurePermission } from '../permission';
+import { PermissionModifier, PermissionModifierOrigin, UserModelForServer } from '../../models';
+import { ensurePermission, getMemberRolePermModifiers } from '../permission';
+import { GuildManager, GuildMember } from 'discord.js';
 
-function genToken(len:number) {
+function genToken(len: number) {
     var result = '';
     var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     var charactersLength = characters.length;
-    for ( var i = 0; i < len; i++ ) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    for (var i = 0; i < len; i++) {
+        // TODO use of unsecure Math.random randomness. Use crypto random instead
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
 }
@@ -19,87 +21,149 @@ function genToken(len:number) {
 
 var allpermtoken = ""
 
-var CommandPermissionPermissionAdd:ICommand = {
+var CommandPermissionPermissionAdd: ICommand = {
     name: "add",
     alias: ["a"],
     requiredPermission: "core.permission.add",
     argtypes: [
         {
-            name: "member",
+            name: "type",
             optional: false,
-            type: EType.MemberDataForServer
+            type: EType.String
+        },
+        {
+            name: "member or role id",
+            optional: false,
+            type: EType.String
+        },
+        {
+            name: "order",
+            optional: false,
+            type: EType.Integer
+        },
+        {
+            name: "action",
+            optional: false,
+            type: EType.String
         },
         {
             name: "permission-name",
             optional: false,
             type: EType.String
-        }
+        },
     ],
     useSubcommands: false,
     subcommmands: [],
     handle: async (c) => {
-        if (!c.args[0]) return
-        if (!c.args[1]) return
-        if (!ensurePermission(c,c.args[1],true)) return
-        if (c.args[0].permissions.includes(c.args[1])) return c.err("Permission already applied.","")
-        console.log({t1: c.args[0]});
-        c.args[0].permissions.push(c.args[1])
-        console.log({t1: c.args[0]});
-        
-        await Database.updateUserDocForServer(c.args[0])
-        c.log(c.translation.permission.permission.success,c.translation.permission.permission.add_success.replace("{0}",c.args[0].id).replace("{1}",c.args[1]));
+        if (!["grant", "revoke"].includes(c.args[3])) return c.err("Invalid action", "")
+        if (!ensurePermission(c, c.args[4], true)) return
+        var newperm: PermissionModifier = {
+            action: c.args[3],
+            name: c.args[4],
+            order: c.args[2]
+        }
+        if (c.args[0].toLowerCase() == "role") {
+            var sd = (await Database.getServerDoc(c.server.id))
+            if (!c.server.roles.resolve(c.args[1])) return c.err("role not found", "")
+            if (!sd.rolePermissions[c.args[1]]) sd.rolePermissions[c.args[1]] = []
+            var rp = sd.rolePermissions[c.args[1]]
+            rp.push(newperm)
+            await Database.updateServerDoc(sd)
+        } else {
+            var ud = await Database.getUserDocForServer(c.args[1], c.server.id)
+            ud.permissions.push(newperm)
+            await Database.updateUserDocForServer(ud)
+        }
+        c.log("", c.translation.permission.permission.success);
     }
 }
 
-var CommandPermissionPermissionRemove:ICommand = {
+var CommandPermissionPermissionRemove: ICommand = {
     name: "remove",
-    alias: ["r","d"],
+    alias: ["r", "d"],
     requiredPermission: "core.permission.remove",
     argtypes: [
         {
-            name: "member",
-            optional: false,
-            type: EType.MemberDataForServer
-        },
-        {
-            name: "permission-name",
+            name: "type",
             optional: false,
             type: EType.String
+        },
+        {
+            name: "member or role id",
+            optional: false,
+            type: EType.String
+        },
+        {
+            name: "index",
+            optional: false,
+            type: EType.Integer
         }
     ],
     useSubcommands: false,
     subcommmands: [],
     handle: async (c) => {
-        if (c.args.includes(undefined)) return
-        if (!c.args[0].permissions.includes(c.args[1])) return c.err(c.translation.error,c.translation.permission.permission.permission_not_found)
-        if (!ensurePermission(c,c.args[1],true)) return
-        var ud: UserModelForServer = c.args[0]
-        ud.permissions.splice(ud.permissions.findIndex(p=>p==c.args[1]),1)
-        await Database.updateUserDocForServer(c.args[0])
-        c.log(c.translation.permission.permission.success,c.translation.permission.permission.remove_success.replace("{0}",c.args[0].name).replace("{1}",c.args[1]));
+        if (c.args[0].toLowerCase() == "role") {
+            var sd = (await Database.getServerDoc(c.server.id))
+            if (!sd.rolePermissions.hasOwnProperty(c.args[1])) return c.err(c.translation.permission.permission.permission_not_found, "")
+            var rp = sd.rolePermissions[c.args[1]]
+            if (c.args[2] >= rp.length) return c.err(c.translation.permission.permission.permission_not_found, "")
+            if (!ensurePermission(c, rp[c.args[2]].name, true)) return
+            rp.splice(c.args[2], 1)
+            await Database.updateServerDoc(sd)
+        } else {
+            var ud = await Database.getUserDocForServer(c.args[1], c.server.id)
+            if (c.args[2] >= ud.permissions.length) return c.err(c.translation.permission.permission.permission_not_found, "")
+            if (!ensurePermission(c, ud.permissions[c.args[2]].name, true)) return
+            ud.permissions.splice(c.args[2], 1)
+            await Database.updateUserDocForServer(ud)
+        }
+        c.log("", c.translation.permission.permission.success);
     }
 }
 
-var CommandPermissionPermissionList:ICommand = {
+var CommandPermissionPermissionList: ICommand = {
     name: "list",
     alias: ["l"],
     requiredPermission: "core.permission.list",
     argtypes: [
         {
-            name: "member",
+            name: "type",
             optional: false,
-            type: EType.MemberDataForServer
+            type: EType.String
+        },
+        {
+            name: "member or role id",
+            optional: false,
+            type: EType.String
+        },
+        {
+            name: "include inherited perms",
+            optional: true,
+            type: EType.Boolean
         }
     ],
     useSubcommands: false,
     subcommmands: [],
-    handle: (c) => {
-        if (!c.args[0]) return
-        c.log(c.translation.permission.permission.permission_list,`\`${c.args[0].permissions.join("`\n`")}\``)
+    handle: async (c) => {
+        var modifiers: PermissionModifierOrigin[] = []
+        if (c.args[0].toLowerCase() == "role") {
+            var raperms = (await c.getServerDoc()).rolePermissions
+            if (!raperms.hasOwnProperty(c.args[1])) return c.err("Role not found", "ID invalid")
+            modifiers = raperms[c.args[1]].map(e => ({...e,origin: undefined}))
+        } else {
+            var member: GuildMember = await c.server.members.fetch({ user: c.args[1] })
+            modifiers = (await Database.getUserDocForServer(member.user.id, c.server.id)).permissions.map(e => ({...e,origin: undefined}));
+            if (c.args[2]) modifiers = [...modifiers, ...(await getMemberRolePermModifiers(await c.getServerDoc(), member))]
+        }
+        const displayPerm = (p: PermissionModifierOrigin, index: number): [number, string] => {
+            return [p.order, `${index}. (${p.order}) ${p.action.toUpperCase()}: ${p.name}` + (p.origin ? ` (inherited from '${p.origin.name}')` : "")]
+        }
+        const sorter = (a: [number, string], b: [number, string]) => b[0] - a[0]
+        c.log(c.translation.permission.permission.permission_list, `\`${modifiers.map(displayPerm).sort(sorter).map(e => e[1]).join("`\n`")}\``)
     }
 }
 
-var CommandPermissionPermission:ICommand = {
+var CommandPermissionPermission: ICommand = {
     name: "permission",
     alias: ["perm"],
     requiredPermission: "core.permission.default",
@@ -110,11 +174,11 @@ var CommandPermissionPermission:ICommand = {
         CommandPermissionPermissionRemove,
         CommandPermissionPermissionList
     ],
-    handle: (c) => {}
-    
+    handle: (c) => { }
+
 }
 
-var CommandPermissionUsePermToken:ICommand = {
+var CommandPermissionUsePermToken: ICommand = {
     name: "usepermtoken",
     alias: [],
     argtypes: [
@@ -130,17 +194,21 @@ var CommandPermissionUsePermToken:ICommand = {
     handle: async (c) => {
         if (c.args[0] == allpermtoken) {
             updateToken()
-            var ud = await Database.getUserDocForServer(c.author.id,c.server.id)
-            ud.permissions.push("*")
+            var ud = await Database.getUserDocForServer(c.author.id, c.server.id)
+            ud.permissions.push({
+                order: 10,
+                name: "*",
+                action: "grant"
+            })
             await Database.updateUserDocForServer(ud);
-            c.log("Success",`Granted all permissions to ${c.author.username}`)
+            c.log("Success", `Granted all permissions to ${c.author.username}`)
         } else {
-            c.err("Du KEK!","Das darfst du nicht!")
+            c.err("Du KEK!", "Das darfst du nicht!")
         }
     }
 }
 
-export var ModulePermission:IModule = {
+export var ModulePermission: IModule = {
     name: "permission",
     commands: [
         CommandPermissionPermission,

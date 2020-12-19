@@ -68,13 +68,13 @@ export class App {
                         let context:CommandContext = new CommandContext(message,m,[],res.command,res.names)
                         if (!await context.init()) return
                         
-                        context.clog("Found a matching command for " + message.content.split(" ")[0]);
+                        context.verboseClog("Found a matching command for " + message.content.split(" ")[0]);
                         
                         if (!context.args_pre) {
                             context.err("Too few or many arguments!","")
                         }
 
-                        var permok = await ensurePermission(context,h.requiredPermission)
+                        var permok = await ensurePermission(context,h.requiredPermission, true)
                         if (permok){
                             res.command.handle(context)
                         } else {

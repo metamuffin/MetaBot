@@ -3,6 +3,10 @@
     "warningTimestamp": 0,
     "warnings": 0,
     "permissions": [
-        "help.*"
+        {
+            "order": 3,
+            "name": "help",
+            "action": "grant"
+        }
     ]
 }

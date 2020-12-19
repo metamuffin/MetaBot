@@ -60,9 +60,7 @@ export interface TranslationModel {
     permission: {
         permission: {
             success: string
-            add_success: string
             permission_not_found: string
-            remove_success: string
             permission_list: string
         }
     }

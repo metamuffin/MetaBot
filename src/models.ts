@@ -1,3 +1,4 @@
+import { Role } from "discord.js";
 
 
 
@@ -11,20 +12,24 @@ export interface UserModelForServer {
     gid:string
     warningTimestamp:number
     warnings:number
-    permissions:Array<string>
+    permissions: PermissionBundle
 }
 
 export interface ServerModel {
     id:string
     enabledModules:Array<string>
     messageBlacklist:Array<string>
-    rolePermissions: {[key: string]: RolePermission}
+    rolePermissions: {[key: string]: PermissionBundle}
 }
 
-export interface RolePermission {
-    grants: string[],
-    revokes: string[],
-    order: number[],
+export type PermissionBundle = PermissionModifier[]
+export interface PermissionModifier {
+    action: "grant" | "revoke"
+    name: string,
+    order: number,
+}
+export interface PermissionModifierOrigin extends PermissionModifier {
+    origin: Role | undefined
 }
 
 export interface GlobalModel {

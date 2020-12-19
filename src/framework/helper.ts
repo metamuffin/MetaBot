@@ -2,6 +2,7 @@ import { Database } from "./database";
 import { CommandContext, IArgument } from "./command";
 import { GenericContext } from './context';
 import { Guild, Channel, TextChannel, Message, VoiceChannel, DMChannel } from "discord.js";
+import { App } from "./core";
 
 export enum EType {
     String,
@@ -41,10 +42,8 @@ export class Helper {
     // Returns the name of command read from a Message that was interpreted as an command.
     // For the usage of Sub-commands, also the next words are returned in the array.
     public static getCommandNames(msg:string):Array<string> {
-        return msg.substr(1,msg.length).split(" ")
+        return msg.substr(App.prefix.length,msg.length).split(" ")
     }
-
-    
 
     public static async parseArguments(msg:string,types:Array<IArgument>,context:GenericContext):Promise<Array<any> | undefined> {
         types = types.slice(0)

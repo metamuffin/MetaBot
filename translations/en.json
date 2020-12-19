@@ -58,8 +58,6 @@
   "permission": {
     "permission":{
       "success": "Permission update successful!",
-      "add_success": "`{0}` now has the permission `{1}`",
-      "remove_success": "`{0}` now doesnt have the permission `{1}` anymore.",
       "description": "Configurate Permissions",
       "permission_not_found": "The specified user already doesnt have this permission.",
       "permission_list": "Permission List:"
