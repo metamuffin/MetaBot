@@ -6,7 +6,7 @@ import { ModuleTutorial } from "./tutorialmodule"
 //import { ModuleCrypto } from "./crypto";
 //import { ModuleVoiceAssistant } from './voice-assistant';
 import { ModuleModerator } from "./moderator";
-import { ModuleAmongUs } from "./musicmanager";
+import { ModuleMusicManager } from "./musicmanager";
 import { ModuleChannelmanager } from "./channelmanager";
 
 export function registerModules():void {
@@ -16,6 +16,6 @@ export function registerModules():void {
         ModuleChannelmanager,
         ModuleTutorial,
         ModuleModerator,
-        ModuleAmongUs,
+        ModuleMusicManager,
     )
 }

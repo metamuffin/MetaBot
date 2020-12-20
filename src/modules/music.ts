@@ -240,8 +240,8 @@ var CommandMusicSkip: ICommand = {
     }
 }
 
-export function preprocessMusicVolume(vol: number): undefined | number {
-    if ((vol < 0.2 || vol > 5) && vol != -1) return undefined
+export function preprocessMusicVolume(vol: number, no_min: boolean = false): undefined | number {
+    if (((vol < 0.2 && !no_min) || vol > 3) && vol != -1) return undefined
     if (vol == -1) vol = 10000
     return vol
 }

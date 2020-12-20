@@ -31,12 +31,13 @@
     "@typeit/discord": "^4.0.8",
     "@types/mongodb": "^3.6.3",
     "discord.js": "^12.5.1",
+    "emoji-data-ts": "0.0.5",
     "mongodb": "^3.6.3",
     "opusscript": "0.0.7",
     "translatte": "^2.5.8",
     "tslib": "^2.0.3",
     "yt-search": "^2.5.1",
-    "ytdl-core": "^4.2.0",
+    "ytdl-core": "^4.2.1",
     "ytsr": "^0.1.21"
   }
 }
