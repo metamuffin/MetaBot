@@ -2,9 +2,10 @@ import { VoidCallback } from "./types";
 import { CommandContext } from "./command";
 import { IdentifiedClass } from "./helper";
 import { App } from "./core";
-import { ColorResolvable, Message, MessageReaction, User } from "discord.js";
+import { ColorResolvable, Message, MessageReaction, ReactionEmoji, User } from "discord.js";
+import { EmojiData } from "emoji-data-ts"
 
-
+var emojidata = new EmojiData()
 
 export interface SelectUIOption {
     text: string,
@@ -37,8 +38,6 @@ export class SelectUI extends GenericUI {
     public options: SelectUIOptionList
     public config: SelectiUIConfig
 
-
-
     constructor(context: CommandContext, prompt: string, options: SelectUIOptionList, config: SelectiUIConfig) {
         super(context)
         this.prompt = prompt
@@ -46,7 +45,7 @@ export class SelectUI extends GenericUI {
         this.config = config
     }
 
-    public async send(): Promise<void> {
+    public async send(): Promise<SelectUI> {
         var messageContent: string = ""
         for (let optionCounter = 0; optionCounter < this.options.length; optionCounter++) {
             const option = this.options[optionCounter];
@@ -63,28 +62,27 @@ export class SelectUI extends GenericUI {
                 }
             }
         })
-            .then((msg) => {
-                this.message = (msg instanceof Message) ? msg : null
-                if (this.message == null) console.log("Internal Error: 2193489489023");
-                for (let optionCounter = 0; optionCounter < this.options.length; optionCounter++) {
-                    const option = this.options[optionCounter];
-                    /*var emoji = App.client.emojis.find((e) => {console.log(e.name); return e.name == option.icon})
-                    if (!emoji) emoji = this.context.guild.emojis.find((e) => {console.log(e.name); return e.name == option.icon})
-                    if (!emoji) return this.context.err("Emoji not found :(","")
-                    console.log(emoji);*/
-
-                    this.message?.react(option.unicode)
-                }
-
-            })
-
+        this.message = (message instanceof Message) ? message : null
+        if (this.message == null) console.log("Internal Error: 2193489489023");
+        for (let optionCounter = 0; optionCounter < this.options.length; optionCounter++) {
+            const option = this.options[optionCounter];
+            /*var emoji = emojidata.searchEmoji(option.icon,1)[0].short_name
+            if (!emoji) emoji = this.context.server.emojis.cache.find((e) => { console.log(e.name); return e.name == option.icon })
+            if (!emoji) return this.context.err("Emoji not found :(", "")
+            console.log(emoji);*/
+            await this.message?.react(option.unicode)
+        }
         InterfaceHandler.registerInterface(this)
-
+        return this;
     }
 
     public handleReactionInteraction(reaction: MessageReaction, user: User): boolean {
+        if (this.context.author.id != user.id && !this.config.public) {
+            reaction.remove()
+            this.context.send("You aren't allowed to react here.", "", 0xFF0000)
+            return false
+        }
         this.context.clog(reaction.emoji.name);
-
         var chosen = this.options.find((o) => o.icon == reaction.emoji.name)
         if (!chosen) return false
         chosen.callback()

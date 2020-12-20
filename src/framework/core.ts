@@ -4,7 +4,7 @@ import { Helper, logWithTags, messageLogNote } from "./helper";
 import { ICommand, CommandContext} from './command';
 import { loadNativeCommands } from "./commands/loader";
 import { HandlerContext } from "./handler";
-import { InterfaceHandler } from "./interfacing";
+import { InterfaceHandler } from "./ui";
 import { Client, MessageReaction, User, Message, PartialUser } from "discord.js";
 import { ensurePermission } from "./permission";
 
