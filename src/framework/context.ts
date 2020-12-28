@@ -69,6 +69,7 @@ export class GenericContext {
     }
 
     public async send(title:string,description:string,color:ColorResolvable): Promise<Message> {
+        if (description.length > 1900) description = description.slice(0,1950)
         return await this.channel.send({embed:{
             color: color,
             title: title,

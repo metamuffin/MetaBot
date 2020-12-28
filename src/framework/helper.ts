@@ -161,3 +161,10 @@ export class Helper {
         return cur
     }
 }
+
+export function limitLen(s:string,limit?:number):string {
+    limit ||= 1900
+    if (s.length > limit) {
+        return s.slice(0,1900) + `\n :( ${s.length - limit} more bytes cant be shown.`
+    } else return s
+}

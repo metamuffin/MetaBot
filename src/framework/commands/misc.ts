@@ -1,6 +1,6 @@
-import { ICommand } from "../command"
+import { CommandContext, ICommand } from "../command"
 import { IModule } from "../module"
-import { EType, Helper } from "../helper"
+import { EType, Helper, limitLen } from "../helper"
 import { App } from "../core"
 import { Database } from "../database"
 import { TranslationModel } from "../../translation"
@@ -19,7 +19,7 @@ export function typeToName(type: EType, t: TranslationModel): string {
 }
 
 
-var CommandMiscAbout:ICommand = {
+var CommandMiscAbout: ICommand = {
     name: "about",
     alias: [],
     useSubcommands: false,
@@ -33,12 +33,42 @@ var CommandMiscAbout:ICommand = {
         out += "MetaBot is licenced under the GNU General Public Licence Version 3, so feel free to contribute or modify this project.\n"
         out += "See the source, issue-tracker, feauture-suggestions and documentation on https://www.github.com/MetaMuffin/MetaBot!"
         out += "Active contributers: only MetaMuffin :("
-        c.log("About",out)
+        c.log("About", out)
     }
 }
 
+export async function getCommandByPath(c: CommandContext, path: string): Promise<ICommand | undefined> {
+    var find_command = (com: ICommand, names: Array<string>, path: Array<string>): ICommand | undefined => {
+        if (names.length < 1) {
+            return com
+        }
+        if (com.useSubcommands) {
+            for (const scom of com.subcommmands) {
+                if (scom.name == names[0] || scom.alias.includes(names[0])) {
+                    names.shift()
+                    path.push(scom.name)
+                    return find_command(scom, names, path)
+                }
+            }
+        }
+        c.err(c.translation.core.general.command_not_found, "")
+        return undefined
+    }
 
-var CommandMiscHelp:ICommand = {
+    var c_names: Array<string> = path.split(".")
+    for (const mod of App.modules) {
+        for (const com of mod.commands) {
+            if (com.name == c_names[0] || com.alias.includes(c_names[0])) {
+                c_names.shift()
+                return find_command(com, c_names, [mod.name, com.name])
+                return
+            }
+        }
+    }
+    c.err(c.translation.error, c.translation.core.general.command_not_found)
+}
+
+var CommandMiscHelp: ICommand = {
     name: "help",
     alias: ["h"],
     useSubcommands: false,
@@ -52,103 +82,74 @@ var CommandMiscHelp:ICommand = {
     ],
     requiredPermission: null,
     handle: async (c) => {
-        if (c.args[0] == ""){
+        if (c.args[0] == "") {
             var outstr = ""
             for (const mod of App.modules) {
-                if (!((await c.getServerDoc()).enabledModules.includes(mod.name))){
+                if (!((await c.getServerDoc()).enabledModules.includes(mod.name))) {
                     outstr += `~~${mod.name}~~: ${c.translation.misc.help.not_enabled}\n`
                     continue
                 }
                 outstr += `**__${mod.name}__**\n`
                 for (const command of mod.commands) {
-                    try{
+                    try {
                         //var unsafe_translation: any = c.translation
                         //var desc: string = `*${c.translation.misc.help.no_description}*`
                         //if (unsafe_translation[mod.name]) if (unsafe_translation[mod.name][command.name]?.description) unsafe_translation[mod.name][command.name].description
                         //outstr += `\u251c\u2500 **${command.name}:** ${desc}\n`
                         outstr += `\u251c\u2500 **${command.name}:**\n`
                     } catch (e) {
-                        c.err("There may be something missing in the help because of a missing translation :(",`Error on \`${mod.name}.${command.name}\``)
+                        c.err("There may be something missing in the help because of a missing translation :(", `Error on \`${mod.name}.${command.name}\``)
                         console.log(`[ERROR] ${command.name}`);
                     }
                 }
             }
-            outstr += "\n" + c.translation.misc.help.more_help.replace("{0}",App.prefix) + "\n"
+            outstr += "\n" + c.translation.misc.help.more_help.replace("{0}", App.prefix) + "\n"
             outstr += c.translation.misc.help.path_desc + "\n"
-            c.log(c.translation.misc.help.title_generic,outstr)
+            c.log(c.translation.misc.help.title_generic, outstr)
         } else {
-            var find_command = (com:ICommand,names:Array<string>,path:Array<string>):string => {
-                if (names.length < 1){
-                    var out = ""
-                    out += `**__${com.name}__**\n`
-                    out += `${c.translation.misc.help.alias} ${com.alias.join(", ")}\n`
-                    out += `${c.translation.misc.help.arguments}`
-                    if (com.argtypes.length == 0) out += c.translation.misc.help.none + "\n"
-                    else {
-                        out += "\n"
-                        for (const a of com.argtypes) {
-                            out += `- \`${a.name}\`: ${typeToName(a.type,c.translation)} (${a.optional ? c.translation.misc.help.optional : c.translation.misc.help.required})\n`
-                        }
-                    }
-                    out += `${c.translation.misc.help.help_description}: ${Helper.deepGet(c.translation,path)?.description || c.translation.misc.help.no_description}\n\n`
-                    out += `${c.translation.misc.help.help_permission}: \`${com.requiredPermission}\`\n`
-                    out += `${c.translation.misc.help.help_subcommands}: ${(com.useSubcommands) ? ("`" + com.subcommmands.map(sc=>sc.name).join("`, `") + "`") : c.translation.misc.help.none}` 
-                    return out
-                }
-                if (com.useSubcommands){
-                    for (const scom of com.subcommmands) {
-                        if (scom.name == names[0] || scom.alias.includes(names[0])){
-                            names.shift()
-                            path.push(scom.name)
-                            return find_command(scom,names,path)
-                        }
-                    }
-                }
-                return c.translation.core.general.command_not_found
-            }
-
-            var c_names:Array<string> = c.args[0].split(".")
-            for (const mod of App.modules) {
-                for (const com of mod.commands){
-                    if (com.name == c_names[0] || com.alias.includes(c_names[0])) {
-                        c_names.shift()
-                        c.log(c.translation.misc.help.title_generic,find_command(com,c_names,[mod.name,com.name]))
-                        return
-                    }
+            var com = await getCommandByPath(c, c.args[0])
+            if (!com) return
+            var out = ""
+            out += `**__${com.name}__**\n`
+            out += `${c.translation.misc.help.alias} ${com.alias.join(", ")}\n`
+            out += `${c.translation.misc.help.arguments}`
+            if (com.argtypes.length == 0) out += c.translation.misc.help.none + "\n"
+            else {
+                out += "\n"
+                for (const a of com.argtypes) {
+                    out += `- \`${a.name}\`: ${typeToName(a.type, c.translation)} (${a.optional ? c.translation.misc.help.optional : c.translation.misc.help.required})\n`
                 }
             }
-            c.err(c.translation.error,c.translation.core.general.command_not_found)
+            out += `${c.translation.misc.help.help_description}: ${Helper.deepGet(c.translation, c.args[0].split("."))?.description || c.translation.misc.help.no_description}\n\n`
+            out += `${c.translation.misc.help.help_permission}: \`${com.requiredPermission}\`\n`
+            out += `${c.translation.misc.help.help_subcommands}: ${(com.useSubcommands) ? ("`" + com.subcommmands.map(sc => sc.name).join("`, `") + "`") : c.translation.misc.help.none}`
+            c.log(c.translation.misc.help.title_generic, out)
         }
     }
 }
 
-/*
-var CommandMiscEval:ICommand = {
-    name: "eval",
-    alias: ["exec"],
+
+var CommandMiscSourceOf: ICommand = {
+    name: "sourcecodeof",
+    alias: ["sourceof"],
     argtypes: [
         {
-            name: "Code",
+            name: "Command",
             type: EType.String,
             optional: false
         }
     ],
     subcommmands: [],
     useSubcommands: false,
-    requiredPermission: "debug.exec",
-    handle: (c) => {
-        var p:any = null;
-        try {
-            p = eval(c.args[0]).toString()
-        } catch (e) {
-            c.err(c.translation.error,e)
-        } finally {
-            c.log("",`\`${p}\``)
-        }
+    requiredPermission: "misc.sourceof",
+    handle: async (c) => {
+        var com = await getCommandByPath(c, c.args[0])
+        if (!com) return c.err(c.translation.error, c.translation.core.general.command_not_found)
+        c.log(`Source of ${c.args[0]}`, "```js\n" + limitLen(com.handle.toString().replace(/`/g,"` ")) + "\n```")
     }
-}*/
+}
 
-export var CommandMiscEcho:ICommand = {
+export var CommandMiscEcho: ICommand = {
     name: "echo",
     alias: [],
     argtypes: [
@@ -166,16 +167,16 @@ export var CommandMiscEcho:ICommand = {
     }
 }
 
-export var ModuleMisc:IModule = {
+export var ModuleMisc: IModule = {
     name: "misc",
     commands: [
         CommandMiscAbout,
         CommandMiscHelp,
-        //CommandMiscEval,
+        CommandMiscSourceOf,
         CommandMiscEcho
     ],
     handlers: [],
     init: async () => {
-        
+
     }
 }
