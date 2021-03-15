@@ -1,3 +1,3 @@
 
 
-export type VoidCallback = ()=>void
+export type VoidCallback = () => void

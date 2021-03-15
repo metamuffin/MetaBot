@@ -5,7 +5,7 @@ import { ModulePermission } from './permission';
 
 
 
-export var loadNativeCommands = ():void => {
+export var loadNativeCommands = (): void => {
     App.modules.push(ModuleMisc)
     App.modules.push(ModuleConfiguration)
     App.modules.push(ModulePermission)

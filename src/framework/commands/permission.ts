@@ -149,10 +149,10 @@ var CommandPermissionPermissionList: ICommand = {
         if (c.args[0].toLowerCase() == "role") {
             var raperms = (await c.getServerDoc()).rolePermissions
             if (!raperms.hasOwnProperty(c.args[1])) return c.err("Role not found", "ID invalid")
-            modifiers = raperms[c.args[1]].map(e => ({...e,origin: undefined}))
+            modifiers = raperms[c.args[1]].map(e => ({ ...e, origin: undefined }))
         } else {
             var member: GuildMember = await c.server.members.fetch({ user: c.args[1] })
-            modifiers = (await Database.getUserDocForServer(member.user.id, c.server.id)).permissions.map(e => ({...e,origin: undefined}));
+            modifiers = (await Database.getUserDocForServer(member.user.id, c.server.id)).permissions.map(e => ({ ...e, origin: undefined }));
             if (c.args[2]) modifiers = [...modifiers, ...(await getMemberRolePermModifiers(await c.getServerDoc(), member))]
         }
         const displayPerm = (p: PermissionModifierOrigin, index: number): [number, string] => {

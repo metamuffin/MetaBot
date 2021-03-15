@@ -4,12 +4,12 @@ import { EType, Helper } from "../helper";
 import { App } from "../core";
 import { Database } from "../database";
 
-var CommandConfigModuleDisable:ICommand = {
+var CommandConfigModuleDisable: ICommand = {
     name: "disable",
     alias: ["d"],
     argtypes: [
         {
-            type:EType.String,
+            type: EType.String,
             name: "Module Name",
             optional: false
         }
@@ -18,23 +18,23 @@ var CommandConfigModuleDisable:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: async (c) => {
-        var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
+        var modlist = App.modules.slice(0).map(e => e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
             var sc = (await c.getServerDoc())
             if (!sc.enabledModules.includes(c.args[0].toLowerCase())) {
                 sc.enabledModules.splice(sc.enabledModules.findIndex(c.args[0].toLowerCase()))
                 await Database.updateServerDoc(sc)
-                c.log(c.translation.success_generic,c.translation.config.module.success_disabled)
+                c.log(c.translation.success_generic, c.translation.config.module.success_disabled)
             } else {
-                c.err(c.translation.error_generic,c.translation.config.module.error_already_disabled.replace("{0}",c.args[0][1]))
+                c.err(c.translation.error_generic, c.translation.config.module.error_already_disabled.replace("{0}", c.args[0][1]))
             }
         } else {
-            c.err(c.translation.error_generic,c.translation.config.module.error_module_not_found.replace("{0}",c.args[0][1]))
+            c.err(c.translation.error_generic, c.translation.config.module.error_module_not_found.replace("{0}", c.args[0][1]))
         }
     }
 }
 
-var CommandConfigModuleEnable:ICommand = {
+var CommandConfigModuleEnable: ICommand = {
     name: "enable",
     alias: ["e"],
     argtypes: [
@@ -48,26 +48,26 @@ var CommandConfigModuleEnable:ICommand = {
     subcommmands: [],
     useSubcommands: false,
     handle: async (c) => {
-        var modlist = App.modules.slice(0).map(e=>e.name.toLowerCase())
+        var modlist = App.modules.slice(0).map(e => e.name.toLowerCase())
         if (modlist.includes(c.args[0].toLowerCase())) {
             var sc = (await c.getServerDoc())
             if (!sc.enabledModules.includes(c.args[0].toLowerCase())) {
                 sc.enabledModules.push(c.args[0].toLowerCase())
                 await Database.updateServerDoc(sc)
-                c.log(c.translation.success_generic,c.translation.config.module.success_enabled)
+                c.log(c.translation.success_generic, c.translation.config.module.success_enabled)
             } else {
-                c.err(c.translation.error_generic,c.translation.config.module.error_already_enabled.replace("{0}",c.args[0]))
+                c.err(c.translation.error_generic, c.translation.config.module.error_already_enabled.replace("{0}", c.args[0]))
             }
         } else {
-            c.err(c.translation.error_generic,c.translation.config.module.error_module_not_found.replace("{0}",c.args[0]))
+            c.err(c.translation.error_generic, c.translation.config.module.error_module_not_found.replace("{0}", c.args[0]))
         }
     }
 }
 
 
-var CommandConfigurationLanguage:ICommand = {
+var CommandConfigurationLanguage: ICommand = {
     name: "language",
-    alias: ["lang","lg"],
+    alias: ["lang", "lg"],
     requiredPermission: null,
     argtypes: [
         {
@@ -78,9 +78,9 @@ var CommandConfigurationLanguage:ICommand = {
     ],
     subcommmands: [],
     useSubcommands: false,
-    handle: async (c:CommandContext) => {
+    handle: async (c: CommandContext) => {
         var lc: string = c.args[0]
-        if (!await Database.getTranslationByName(lc.toLowerCase())){
+        if (!await Database.getTranslationByName(lc.toLowerCase())) {
             if (lc.length != 2) return c.err("ERROR", "Language Code invalid");
             c.err("This language is missing", "The language you selected is not yet availible. Feel free to contribute to Metabot by translating. https://www.github.com/MetaMuffin/Metabot")
             return
@@ -88,13 +88,13 @@ var CommandConfigurationLanguage:ICommand = {
         var ua = await c.getAuthorDoc()
         ua.language = lc.toLowerCase();
         await c.updateAuthorDoc(ua)
-        c.log("Settings changed successfully!","The next time you run any command, the language will be updated.");
+        c.log("Settings changed successfully!", "The next time you run any command, the language will be updated.");
     }
 }
 
 
 
-var CommandConfigModule:ICommand = {
+var CommandConfigModule: ICommand = {
     name: "module",
     alias: ["mod"],
     useSubcommands: true,
@@ -104,12 +104,12 @@ var CommandConfigModule:ICommand = {
     ],
     argtypes: [],
     requiredPermission: "config.module.default",
-    handle: (c)=>{}
+    handle: (c) => { }
 }
 
 
 
-export var ModuleConfiguration:IModule = {
+export var ModuleConfiguration: IModule = {
     name: "config",
     commands: [
         CommandConfigModule,
@@ -117,6 +117,6 @@ export var ModuleConfiguration:IModule = {
     ],
     handlers: [],
     init: async () => {
-        
+
     }
 }
