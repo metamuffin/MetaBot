@@ -10,7 +10,7 @@ export interface IHandler {
     disablePermission: string | null,
     doPermissionError: boolean,
     regex: RegExp,
-    handle: (context: HandlerContext) => void
+    handle: (context: HandlerContext) => Promise<boolean>
 }
 
 

@@ -4,8 +4,8 @@
   "core":{
     "permission":{
         "no_permission":{
-          "title":"You don't have to permissions to run this command.",
-          "description":"You need `{perm}` to do it."
+          "title":"You don't have the permissions to run this command.",
+          "description":"The permission `{perm}` is required."
         }
     },
     "general":{

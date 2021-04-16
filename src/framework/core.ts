@@ -18,7 +18,7 @@ export class App {
     public static workspace: string;
     public static modules: Array<IModule> = [];
 
-
+    
     setWorkspace(path: string): void {
         App.workspace = path;
     }
@@ -60,6 +60,15 @@ export class App {
         var activeModules: Array<string> = (await Database.getServerDoc(message.guild.id)).enabledModules;
         for (const m of App.modules) {
             if (!activeModules.includes(m.name)) continue;
+            for (const handler of m.handlers) {
+                if (message.content && handler.regex.test(message.content)) {
+                    var context = new HandlerContext(message, handler)
+                    if (!await context.init()) return
+                    if (await ensurePermission(context, handler.enablePermission, handler.doPermissionError) && (!await ensurePermission(context, handler.disablePermission, false))) {
+                        if (!await handler.handle(context)) return 
+                    }
+                }
+            }
             if (isCommand) {
                 for (const h of m.commands) {
                     var res = App.getMatchingCommand(h, c_names)
@@ -84,15 +93,7 @@ export class App {
                     }
                 }
             }
-            for (const handler of m.handlers) {
-                if (message.content && handler.regex.test(message.content)) {
-                    var context = new HandlerContext(message, handler)
-                    if (!await context.init()) return
-                    if (await ensurePermission(context, handler.enablePermission, handler.doPermissionError) && (!await ensurePermission(context, handler.disablePermission, false))) {
-                        handler.handle(context)
-                    }
-                }
-            }
+
         }
         if (isCommand && !foundCommand) {
             message.reply("Command not found.")

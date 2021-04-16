@@ -8,6 +8,7 @@ import { ModuleTutorial } from "./tutorialmodule"
 import { ModuleModerator } from "./moderator";
 import { ModuleMusicManager } from "./musicmanager";
 import { ModuleChannelmanager } from "./channelmanager";
+import { ModuleUseless } from "./useless";
 
 export function registerModules():void {
     App.modules.push(
@@ -17,5 +18,6 @@ export function registerModules():void {
         ModuleTutorial,
         ModuleModerator,
         ModuleMusicManager,
+        ModuleUseless
     )
 }
