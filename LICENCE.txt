@@ -1,4 +1,4 @@
-The MetaBot Bot-Framework.
+MetaBot
 Copyright (C) 2020 MetaMuffin
 
 This program is free software: you can redistribute it and/or modify

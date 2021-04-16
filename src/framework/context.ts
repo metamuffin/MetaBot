@@ -68,17 +68,16 @@ export class GenericContext {
         return await this.send(title, description, 0xff0000)
     }
 
-    public async send(title: string, description: string, color: ColorResolvable): Promise<Message> {
-        return await this.channel.send({
-            embed: {
-                color: color,
-                title: title,
-                description: description,
-                footer: {
-                    text: ``
-                }
+    public async send(title:string,description:string,color:ColorResolvable): Promise<Message> {
+        if (description.length > 1900) description = description.slice(0,1950)
+        return await this.channel.send({embed:{
+            color: color,
+            title: title,
+            description: description,
+            footer: {
+              text: ``
             }
-        });
+        }});
     }
 
     public async getServerDoc(): Promise<ServerModel> {
